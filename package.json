@@ -5,13 +5,15 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node app.js"
+    "start": "nodemon app.js"
   },
   "author": "Group 17",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.6.8",
     "express": "^4.19.2",
+    "moments": "^0.0.2",
+    "mongodb": "^6.5.0",
     "nodemon": "^3.1.0"
   }
 }
