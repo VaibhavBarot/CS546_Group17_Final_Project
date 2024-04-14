@@ -1,9 +1,10 @@
 import bugRoutes from './bugs.js';
 // import commentRoutes from './comments.js'
-
+import projectRoutes from './projects.js';
 
 const constructorMethod = (app) => {
   app.use('/bugs', bugRoutes);
+  app.use('/projects',projectRoutes);
 //   app.use('/reviews', reviewRoutes);
 
   app.use('*', (req, res) => {

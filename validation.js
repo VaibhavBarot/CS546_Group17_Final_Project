@@ -60,6 +60,19 @@ const exportedMethods = {
     }
 
     return arr;
+  },
+  validateMembers(arr, varName) {
+    //we will make sure all members are strings and of valid ObjectId type.
+    if (!arr || !Array.isArray(arr))
+      throw `You must provide an array of ${varName}`;
+    for (let i in arr) {
+      if (typeof arr[i] !== 'string' && arr[i].trim().length === 0 && !ObjectId.isValid(arr[i])) {
+        throw `One or more elements in ${varName} array is not a string or is an empty string`;
+      }
+      arr[i] = arr[i].trim();
+    }
+
+    return arr;
   }
 };
 
