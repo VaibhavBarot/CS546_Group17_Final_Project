@@ -60,6 +60,30 @@ const exportedMethods = {
     }
 
     return arr;
+  },
+
+  checkBug(updateObject){
+    let {title, description,creator,status,priority,assignedTo,members,projectId,estimatedTime,createdAt} = updateObject;
+    this.checkString(title, 'Title');
+    this.checkString(description, 'Desription');
+    this.checkString(status, 'Status');
+    this.checkString(priority, 'Priority');
+    this.checkNumber(estimatedTime, 'Estimated Time');
+    this.checkId(creator, 'Creator');
+    this.checkId(assignedTo,'Assigned To');
+    this.checkId(projectId,'Project Id');
+    this.checkStringArray(members,'Members');
+    this.checkDate(createdAt,'Created At');
+  },
+
+  checkComment(updateObject_comment)
+  {
+    let {bugId, userId, timestamp,content,files} = updateObject_comment;
+    this.checkId(bugId, 'Bug Id'),
+    this.checkDate(timestamp,'TimeStamp'),
+    this.checkString(content,'Content'),
+    this.checkId(userId,'User Id'),
+    this.checkStringArray(files,'Files')
   }
 };
 

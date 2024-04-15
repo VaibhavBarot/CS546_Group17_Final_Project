@@ -18,39 +18,12 @@ const createBug = async (
 ) =>
 {
     //TODO: validation Check for objectId for members
-  
+    let create_object = {title:title, description:description, creator:creator, status:status, priority:priority, assignedTo:assignedTo, members:members, projectId:projectId, estimatedTime: estimatedTime, createdAt:createdAt}
     if(!title || !description || !creator || !status || !priority || !assignedTo || !members || !projectId || !estimatedTime || !createdAt)
     {
         throw "All fields must be supplied"
     }
-    validation.checkString(title, 'Title');
-    validation.checkString(description, 'Desription');
-    validation.checkString(status, 'Status');
-    validation.checkString(priority, 'Priority');
-    validation.checkNumber(estimatedTime, 'Estimated Time');
-    validation.checkId(creator, 'Creator');
-    validation.checkId(assignedTo,'Assigned To');
-    validation.checkId(projectId,'Project Id');
-    validation.checkStringArray(members,'Members');
-    validation.checkDate(createdAt,'Created At');
-
-    
-    
-    //CreatedAt error handling
-
-    // const date_format = now.format("ddd MMM DD YYYY HH:mm:ss GMTZ (ZZ)")
-    // if(!moment(createdAt, date_format, true).isValid())
-    // {
-    //     throw "Invalid Date format. Use ddd MMM DD YYYY HH:mm:ss GMTZ (ZZ) "
-    // }
-    
-    // const created_date1 = moment(createdAt, date_format)
-    // const curr_date = moment();
-    // if(created_date1.isAfter(curr_date))
-    // {
-    //     throw "Date must be current date or past date"
-    // }
-    
+    validation.checkBug(create_object,'Bug Created')  
 
     
     const dbcon = await dbConnection()
@@ -77,28 +50,40 @@ const createBug = async (
     return create_bug2;
 }
 
-const getAll = async() => {
-   
+const getAll = async(projectId) => {    
+   const dbcon = await dbConnection();
+   if(!projectId) throw "Invalid Project ID"
+   validation.checkString(projectId,'Project ID')
+   validation.checkId(projectId,'Project ID')
+    const bugs = await dbcon.collection('bugs').find({projectId:projectId}).toArray()
+    return bugs;
+    // const bugs = await dbcon.collection('')
+
+
 }
 
-const getBug = async(projectId) => {   //getbug with project id or bug id ??
+const getBug = async(bugId) => {   
+    const dbcon = await dbConnection();
+    if(!bugId) throw "Invalid bug Id"
+    validation.checkString(bugId,'BugId')
+    validation.checkId(bugId, 'BugId')
+    const get_bug = await dbcon.collection('bugs').findOne({_id : new ObjectId(bugId)})
+    return get_bug
 
 }
 
-const update = async(
+const updateBug = async(
     bugId,
-    title,
-    description,
-    creator,
-    status,
-    priority,
-    assignedTo,
-    members,
-    projectId,
-    estimatedTime,
-    createdAt
+    updateObject
 ) => {
    //TODO: error Handling 
+   let {title, description,creator,status,priority,assignedTo,members,projectId,estimatedTime,createdAt} = updateObject;
+
+   if(!title || !description || !creator || !status || !priority || !assignedTo || !members || !projectId || !estimatedTime || !createdAt)
+   {
+       throw "All fields must be supplied"
+   }
+   validation.checkBug(updateObject, 'Updated Object')
    const dbcon = await dbConnection();
    const result = await dbcon.collection('bugs').updateOne({_id: new ObjectId(bugId)},
    {
@@ -116,7 +101,7 @@ const update = async(
     }
    }, {returnDocument: 'after'},
    );
-   if(result.modifiedCOunt === 0)
+   if(result.modifiedCount === 0)
    {
     throw "Bug Not found"
    }
@@ -125,4 +110,18 @@ const update = async(
 }
 
 
-export default {createBug}
+const deleteBug = async(bugId) =>{
+    //error handling
+    validation.checkId(bugId,'BugId')
+    const dbcon = await dbConnection()
+    const delete_bug = await getBug(bugId, dbcon)
+    const delete_bug1 = await dbcon.collection('bugs').deleteOne({_id:new ObjectId(bugId)});
+    if(delete_bug1.deletedCount === 0)
+    {
+        throw "Bug not deleted"
+    }
+
+    return {_id:delete_bug._id, deleted:true}
+}
+
+export default {createBug,getAll,getBug, updateBug, deleteBug}
