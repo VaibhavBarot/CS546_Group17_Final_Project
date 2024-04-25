@@ -52,6 +52,7 @@ const exportedMethods = {
     //if it's not empty, we will make sure all tags are strings
     if (!arr || !Array.isArray(arr))
       throw `You must provide an array of ${varName}`;
+    if(arr.length===0) throw `${varName} cannot be empty`;
     for (let i in arr) {
       if (typeof arr[i] !== 'string' || arr[i].trim().length === 0) {
         throw `One or more elements in ${varName} array is not a string or is an empty string`;
@@ -64,15 +65,16 @@ const exportedMethods = {
   validateMembers(arr, varName) {
     //we will make sure all members are strings and of valid ObjectId type.
     if (!arr || !Array.isArray(arr))
-      throw `You must provide an array of ${varName}`;
+    throw `You must provide an array of ${varName}`;
+    if(arr.length===0) throw `${varName} cannot be empty`;
     for (let i in arr) {
-      if (typeof arr[i] !== 'string' && arr[i].trim().length === 0 && !ObjectId.isValid(arr[i])) {
+      if (typeof arr[i] !== 'string' || arr[i].trim().length === 0 || !ObjectId.isValid(arr[i])) {
         throw `One or more elements in ${varName} array is not a string or is an empty string`;
       }
       arr[i] = arr[i].trim();
     }
 
-    return arr;
+  return arr;
   }
 };
 

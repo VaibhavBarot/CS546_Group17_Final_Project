@@ -23,7 +23,21 @@ const createProjects=async(
     {
         throw "Members cant be zero."
     }
+    projectMembers.forEach(element => {
+        validation.checkString(element,"Member");
+        if (!ObjectId.isValid(element)){
+            throw "One or more member ids are invalid.";
+        }
+    });
     const proj=await projects();
+    const projs=await proj.find({}).toArray();
+    // console.log(users);
+    projs.forEach(element => {if(element.name.toLowerCase()===project.name.toLowerCase()) throw `A project with the name ${project.name} already exists.`
+    });
+    // const existingProject= await proj.findOne({name:projectName});
+    // if(existingProject){
+    //     throw `A project with the name ${projectName} already exists.`
+    // }
     const result=await proj.insertOne(project);
     if(!result || !result.acknowledged) throw "Project insertion failed!";
     return result;
@@ -36,7 +50,8 @@ const getAllProjects = async () =>{
     // convert ObjectId  to string
     allProjects=allProjects.map((proj)=> {proj._id=proj._id.toString();return proj;});
     //Will only show project name and its description
-    return allProjects.map((project)=>({name:project.name,description:project.description}));
+    // return allProjects.map((project)=>({name:project.name,description:project.description}));
+    return allProjects;
 };
 const getProject=async(projectId)=>{
     // projectId=projectId.trim();
@@ -58,8 +73,10 @@ const updateProject=async(projectId,updateProductObject)=>{
         project.creator=updateProductObject.creator.trim();
     }
     if(updateProductObject.members){
-        validation.validateMembers(updateProductObject.members,"Members")
-        project.members=updateProductObject.members;
+        if(validation.validateMembers(updateProductObject.members,"Members"))
+        {
+            project.members=updateProductObject.members;
+        }
     }
     else{
         project.name=project.name;
@@ -68,7 +85,7 @@ const updateProject=async(projectId,updateProductObject)=>{
         project.members=project.members;
     }
     const updatedproject=await projectCollection.findOneAndUpdate({"_id":new ObjectId(projectId)},{$set:project},{returnDocument:'after'});
-    console.log(updatedproject);
+    // console.log(updatedproject);
     if(!updatedproject) throw "Update Failed";
     const fetchupdatedproject= await  projectCollection.findOne({_id: new ObjectId(projectId)});
     return fetchupdatedproject;

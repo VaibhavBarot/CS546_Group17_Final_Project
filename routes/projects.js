@@ -29,7 +29,7 @@ router
     if(!result){
         return res.status(400).json('Error creating new Project');
     }
-    console.log(result);
+    // console.log(result);
     res.json(result);
     }catch(e){return res.status(500).json({error: e.toString()});}
 })
@@ -61,9 +61,10 @@ router
     if(!name &&! description && !creator && !members ){
       return res.status(400).json("Enter atleast one field for patch")
     }
+    // if(!validation.validateMembers(members,"Members")){return res.status(400).json("Enter atleast one member")}
     try{
       let ans=await projectData.updateProject(req.params.projectId,req.body);
-      console.log(ans);
+    //   console.log(ans);
       return res.status(200).json(ans);
     }catch(e){return res.status(404).json({error: e.toString()});};
     })
