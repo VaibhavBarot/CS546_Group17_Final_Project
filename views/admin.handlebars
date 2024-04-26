@@ -1,5 +1,5 @@
 <div class="container">
-    <p class="h1 text-center my-2 text-bg-success form-border">Add User</p>
+    <p class="h1 text-center my-2 text-bg-danger form-border">Create Manager</p>
     <form class="row form-border p-2 g-3 mt-2" method="post" action="/register">
         <div class="col-md-6">
             <label for="fname" class="form-label">First Name</label>
@@ -14,13 +14,12 @@
             <input type="email" class="form-control" id="email" name="email" required>
         </div>
         <div class="col-md-6">
-            <label for="password" class="form-label">Password</label>
+            <label for="inputPassword4" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
-
-        <input type="hidden" value="user" name="role">
+        <input type="hidden" value="manager" name="role">
         <div class="col-12 text-center">
-            <button type="submit" class="btn btn-success">Create Account</button>
+            <button type="submit" class="btn btn-danger">Create Account</button>
         </div>
     </form>
 </div>

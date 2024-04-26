@@ -62,6 +62,18 @@ const getAll = async(projectId) => {
 
 }
 
+export const getAllUserBugs = async(userId) => {    
+    const dbcon = await dbConnection();
+    if(!userId) throw "Invalid Project ID"
+    validation.checkString(userId,'Project ID')
+    validation.checkId(userId,'Project ID')
+     const bugs = await dbcon.collection('bugs').find({members:userId}).toArray();
+     return bugs;
+     // const bugs = await dbcon.collection('')
+ 
+ 
+ }
+
 const getBug = async(bugId) => {   
     const dbcon = await dbConnection();
     if(!bugId) throw "Invalid bug Id"
@@ -184,4 +196,4 @@ const deleteBug = async(bugId) =>{
 //     return {success: true,message:"New tester added"}
 // }
 
-export default {createBug,getAll,getBug, updateBug, deleteBug}
+export default {createBug, getAll, getBug, updateBug, deleteBug, getAllUserBugs}

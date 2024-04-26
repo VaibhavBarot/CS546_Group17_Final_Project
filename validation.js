@@ -62,6 +62,22 @@ const exportedMethods = {
     return arr;
   },
 
+  checkEmail(email){
+    if(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)) throw "Invalid email address";
+  },
+
+  checkUser(user){
+    let {fname,lname,email,password,role} = user;
+    fname = this.checkString(fname, 'First Name');
+    lname = this.checkString(lname, 'Last Name');
+    email = this.checkString(email, 'Email');
+    //this.checkEmail(email);
+    password = this.checkString(password, 'Password');
+    role = this.checkString(role, 'Role');
+
+    return {fname,lname,email,password,role};
+  },
+
   checkBug(updateObject){
     let {title, description,creator,status,priority,assignedTo,members,projectId,estimatedTime,createdAt} = updateObject;
     this.checkString(title, 'Title');
