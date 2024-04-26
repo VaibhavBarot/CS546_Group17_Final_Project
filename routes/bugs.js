@@ -77,10 +77,10 @@ router
     let updateObject = req.body
     let {title, description,creator,status,priority,assignedTo,members,projectId,estimatedTime,createdAt} = req.body
     try{
-        if(!title || !description || !creator || !status || !priority || !assignedTo || !members || !projectId || !estimatedTime || !createdAt)
-   {
-       throw "All fields must be supplied"
-   }   
+//         if(!title || !description || !creator || !status || !priority || !assignedTo || !members || !projectId || !estimatedTime || !createdAt)
+//    {
+//        throw "All fields must be supplied"
+//    }   
    validation.checkBug(updateObject, 'Updated Bug')
    const update_bug = await bugData.updateBug(bugId, updateObject)
    return res.json(update_bug)
@@ -126,5 +126,6 @@ router
 })
 
 
+    
 
 export default router;
