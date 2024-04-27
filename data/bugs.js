@@ -62,6 +62,18 @@ const getAll = async(projectId) => {
 
 }
 
+export const getAllUserBugs = async(userId) => {    
+    const dbcon = await dbConnection();
+    if(!userId) throw "Invalid Project ID"
+    validation.checkString(userId,'Project ID')
+    validation.checkId(userId,'Project ID')
+     const bugs = await dbcon.collection('bugs').find({members:userId}).toArray();
+     return bugs;
+     // const bugs = await dbcon.collection('')
+ 
+ 
+ }
+
 const getBug = async(bugId) => {   
     const dbcon = await dbConnection();
     if(!bugId) throw "Invalid bug Id"
@@ -124,4 +136,64 @@ const deleteBug = async(bugId) =>{
     return {_id:delete_bug._id, deleted:true}
 }
 
-export default {createBug,getAll,getBug, updateBug, deleteBug}
+// const bugTransfer = async(bugId) =>{
+//     validation.checkId(bugId,'BugId')
+//     const dbcon = await dbConnection()
+//     const bug_transfer = await dbcon.collection('bugs').findOne({_id: new ObjectId(bugId)})
+//     if(!bug)
+//     {
+//         throw "bug not found "
+//     }
+//     if (!bug.members || bug.members.length === 0) {
+//         throw "No members found for this bug";
+//     }
+// }
+
+// const assignNewDeveloper = async(bugId) =>{
+//     validation.checkId(bugId,'BugId')
+//     const dbcon = await dbConnection()
+//     const bug = await dbcon.collection('bugs').findOne({_id: new ObjectId(bugId)})
+//     if(!bug) {throw "Bug not found"}
+//     const users = await dbcon.collection('users').find({role: 'developer'}).toArray()
+//     if(!users || users.length===0)
+//     {
+//         throw "No Developers found"
+//     }
+//     const dev_id = [];
+//     for(let i = 0; i<users.length;i++)
+//     {
+//         dev_id.push(users[i]._id)
+//     }
+//     const result = await dbcon.collection('bugs').updateOne(
+//         {_id: new ObjectId(bugId)},
+//         { $addToSet: { members: { $each: dev_id } } }
+        
+//     );
+//     return {success: true,message:"New Developer added"}
+
+// }
+
+// const assignNewTester = async(bugId) =>{
+//     validation.checkId(bugId,'BugId')
+//     const dbcon = await dbConnection()
+//     const bug = await dbcon.collection('bugs').findOne({_id: new ObjectId(bugId)})
+//     if(!bug) {throw "Bug not found"}
+//     const users = await dbcon.collection('users').find({role: 'tester'}).toArray()
+//     if(!users || users.length===0)
+//     {
+//         throw "No Tester found"
+//     }
+//     const tester_id = [];
+//     for(let i = 0; i<users.length;i++)
+//     {
+//         tester_id.push(users[i]._id)
+//     }
+//     const result = await dbcon.collection('bugs').updateOne(
+//         {_id: new ObjectId(bugId)},
+//         { $addToSet: { members: { $each: tester_id } } }
+        
+//     );
+//     return {success: true,message:"New tester added"}
+// }
+
+export default {createBug, getAll, getBug, updateBug, deleteBug, getAllUserBugs}
