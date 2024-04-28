@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded',function(){
     const signup_form = document.getElementById('signup-form')
     const signin_form = document.getElementById('signin-form')
-    const admin_manager_signup_form = document.getElementById('admin-manager-signup-form')
-    const manager_devtest_signup_form = document.getElementById('manager-devtest-signup-form')
+    const create_manager_signup_form = document.getElementById('create-manager-signup-form')
+    const create_devtest_signup_form = document.getElementById('create-devtest-signup-form')
 
     const client_validations = {
   
@@ -148,6 +148,135 @@ document.addEventListener('DOMContentLoaded',function(){
                 }
                 signin_form.submit();
             })
+        }
+        if(create_manager_signup_form){
+            create_manager_signup_form.addEventListener('submit',function(event){
+                let errors = [];
+                event.preventDefault();
+    
+                try{
+                    firstName = document.getElementById('fname').value.trim()
+                    firstName = client_validations.checkString(firstName,'First Name',errors)
+                    client_validations.checkName(firstName, 'First Name')
+                } catch(e){
+                    errors.push(e)
+                }
+                try{
+                    lastName = document.getElementById('lname').value.trim()
+                    lastName = client_validations.checkString(lastName,'Last Name')
+                    client_validations.checkName(lastName,'Last Name')
+                }catch(e){
+                    errors.push(e)
+                }
+            try{
+                    email = document.getElementById('email').value.trim().toLowerCase()
+                    email = client_validations.checkString(email,'Email')
+                    client_validations.checkEmail(email)
+            }
+            catch(e){
+                errors.push(e)
+            }
+            try{
+    
+                    password = document.getElementById('password').value.trim()
+                    password = client_validations.checkString(password,'password')
+                    client_validations.checkPassword(password,'Password')
+    
+                    
+                }
+                catch(e)
+                {
+                    errors.push(e)
+                }
+                try{
+                    confirmPassword = document.getElementById('confirmPassword').value.trim()
+                    if(confirmPassword !== password){
+                        throw "Error: Password does not match"
+                    }
+                 }  
+                 catch(e)
+                 {
+                    errors.push(e)
+                 } 
+             
+                if(errors.length > 0){
+                    let errorDiv = document.getElementById('error');
+                    errorDiv.classList.remove('invisible');
+                    errorDiv.innerHTML = ''
+                    return errors.forEach(error => {
+                        let p = document.createElement('p')
+                        p.innerText = error;
+                        errorDiv.appendChild(p);
+                    })
+                }
+                create_manager_signup_form.submit()
+               
+               })
+        }
+
+        if(create_devtest_signup_form){
+            create_devtest_signup_form.addEventListener('submit',function(event){
+                let errors = [];
+                event.preventDefault();
+    
+                try{
+                    firstName = document.getElementById('fname').value.trim()
+                    firstName = client_validations.checkString(firstName,'First Name',errors)
+                    client_validations.checkName(firstName, 'First Name')
+                } catch(e){
+                    errors.push(e)
+                }
+                try{
+                    lastName = document.getElementById('lname').value.trim()
+                    lastName = client_validations.checkString(lastName,'Last Name')
+                    client_validations.checkName(lastName,'Last Name')
+                }catch(e){
+                    errors.push(e)
+                }
+            try{
+                    email = document.getElementById('email').value.trim().toLowerCase()
+                    email = client_validations.checkString(email,'Email')
+                    client_validations.checkEmail(email)
+            }
+            catch(e){
+                errors.push(e)
+            }
+            try{
+    
+                    password = document.getElementById('password').value.trim()
+                    password = client_validations.checkString(password,'password')
+                    client_validations.checkPassword(password,'Password')
+    
+                    
+                }
+                catch(e)
+                {
+                    errors.push(e)
+                }
+                try{
+                    confirmPassword = document.getElementById('confirmPassword').value.trim()
+                    if(confirmPassword !== password){
+                        throw "Error: Password does not match"
+                    }
+                 }  
+                 catch(e)
+                 {
+                    errors.push(e)
+                 } 
+             
+                if(errors.length > 0){
+                    let errorDiv = document.getElementById('error');
+                    errorDiv.classList.remove('invisible');
+                    errorDiv.innerHTML = ''
+                    return errors.forEach(error => {
+                        let p = document.createElement('p')
+                        p.innerText = error;
+                        errorDiv.appendChild(p);
+                    })
+                }
+                create_devtest_signup_form.submit()
+               
+               })
         }
 
 });

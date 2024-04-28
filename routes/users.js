@@ -24,7 +24,7 @@ router.route('/register')
             { value: lname, name: 'Last name' },
             { value: email, name: 'Email' },
             { value: password, name: 'Password' },
-            {value: confirmPassword, name:'Confirm Password'},
+            { value: confirmPassword, name:'Confirm Password'},
             { value: role, name: 'Role'}
         ];
         
@@ -100,7 +100,8 @@ router.route('/login')
 router.route('/dashboard')
 .get(async (req, res) => {
     try{
-        const result = await getAllUserBugs(req.session.user.id);
+        // const result = await getAllUserBugs(req.session.user._id);
+        // req.session.user = result
         return res.render('dashboard');
     } catch(e){
         console.log(e);
