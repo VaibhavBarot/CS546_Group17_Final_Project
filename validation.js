@@ -75,6 +75,60 @@ const exportedMethods = {
     }
 
   return arr;
+  },
+
+  checkEmail(email){
+    if(!(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email))) throw "Invalid email address";
+  },
+
+  checkUser(user){
+    let {fname,lname,email,password,role} = user;
+    fname = this.checkString(fname, 'First Name');
+    this.checkName(fname);
+    lname = this.checkString(lname, 'Last Name');
+    this.checkName(lname);
+    email = this.checkString(email, 'Email');
+    //this.checkEmail(email);
+    password = this.checkString(password, 'Password');
+    role = this.checkString(role, 'Role');
+
+    return {fname,lname,email,password,role};
+  },
+
+  checkName(strVal, varName){
+    if(strVal.length < 2 || strVal.length > 25 || /\d/.test(strVal)) throw `Invalid ${varName} `
+  },
+
+  checkPassword(strVal, varName){
+    if(strVal.length < 8 ) throw `Error: ${varName} must be of 8 characters minimum`
+    const password_regex =  /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+    if(!password_regex.test(strVal)){
+        throw `Invalid Password format ${varName} . Password must contain at least one number and there has to be at least one special character`
+    }
+  },
+
+  checkBug(updateObject){
+    let {title, description,creator,status,priority,assignedTo,members,projectId,estimatedTime,createdAt} = updateObject;
+    this.checkString(title, 'Title');
+    this.checkString(description, 'Desription');
+    this.checkString(status, 'Status');
+    this.checkString(priority, 'Priority');
+    this.checkNumber(estimatedTime, 'Estimated Time');
+    this.checkId(creator, 'Creator');
+    this.checkId(assignedTo,'Assigned To');
+    this.checkId(projectId,'Project Id');
+    this.checkStringArray(members,'Members');
+    this.checkDate(createdAt,'Created At');
+  },
+
+  checkComment(updateObject_comment)
+  {
+    let {bugId, userId, timestamp,content,files} = updateObject_comment;
+    this.checkId(bugId, 'Bug Id'),
+    this.checkDate(timestamp,'TimeStamp'),
+    this.checkString(content,'Content'),
+    this.checkId(userId,'User Id'),
+    this.checkStringArray(files,'Files')
   }
 };
 
