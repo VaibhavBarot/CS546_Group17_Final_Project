@@ -7,7 +7,6 @@ const constructorMethod = (app) => {
   app.use('/bugs', bugRoutes);
   app.use('/comments', commentRoutes);
   app.use('/',userRoutes)
-//   app.use('/reviews', reviewRoutes);
 
   app.use('*', (req, res) => {
     res.status(404).json({error: 'Route Not found'});
