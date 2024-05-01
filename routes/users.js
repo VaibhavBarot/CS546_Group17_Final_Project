@@ -3,6 +3,7 @@ import { registerUser, loginUser } from '../data/users.js';
 import {getAllUserBugs} from '../data/bugs.js';
 import validation from '../validation.js';
 import moment from 'moment';
+import { getAllUserProjects } from '../data/projects.js';
 
 const router = Router()
 router.route('/').get(async(req,res) => {
@@ -100,9 +101,8 @@ router.route('/login')
 router.route('/dashboard')
 .get(async (req, res) => {
     try{
-        // const result = await getAllUserBugs(req.session.user._id);
-        // req.session.user = result
-        return res.render('dashboard');
+        const result = await getAllUserProjects(req.session.user._id);
+        return res.render('dashboard',{role:'user',packages:result});
     } catch(e){
         console.log(e);
     }

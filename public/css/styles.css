@@ -2,3 +2,28 @@
     border: 1px solid black;
     border-radius: 10px;
 }
+
+#filter {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: white;
+}
+
+.controls input[type="number"],
+.controls input[type="text"] {
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+#search {
+    cursor: pointer;
+    padding: 5px 20px;
+    border-radius: 4px;
+    border: none;
+    font-size: 1em;
+}
+

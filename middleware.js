@@ -4,7 +4,7 @@ app.use(express.json());
 
 export const root_middleware = (req,res,next) =>{
     if(!req.session.user){
-        if(req.url !=='/login')
+        if(req.url !=='/login' && req.url !== '/register')
         return res.redirect('/login')
         next()
     }
