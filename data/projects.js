@@ -1,6 +1,5 @@
-import {projects} from "../config/mongoCollections.js"
 import { ObjectId } from "mongodb";
-// import { projects } from "../config/mongoConnection.js";
+import { dbConnection } from "../config/mongoConnection.js";
 import validation from '../validation.js';
 const createProjects=async(
     projectName,
@@ -29,7 +28,7 @@ const createProjects=async(
             throw "One or more member ids are invalid.";
         }
     });
-    const proj=await projects();
+    const proj=await dbConnection();
     const projs=await proj.find({}).toArray();
     // console.log(users);
     projs.forEach(element => {if(element.name.toLowerCase()===project.name.toLowerCase()) throw `A project with the name ${project.name} already exists.`
@@ -44,7 +43,7 @@ const createProjects=async(
 };
 
 const getAllProjects = async () =>{
-    const projectCollection= await projects();
+    const projectCollection= await dbConnection();
     let allProjects=await projectCollection.find({}).toArray();
     if(!allProjects){throw "Failed to fetch Projects"};
     // convert ObjectId  to string
@@ -57,14 +56,23 @@ const getProject=async(projectId)=>{
     // projectId=projectId.trim();
     if(!projectId || !ObjectId.isValid(projectId)){throw "Id is empty or invalid."}
     validation.checkString(projectId,"projectId");
-    const projectsCollection=await projects();
+    const projectsCollection=await dbConnection();
     let requestedProject= projectsCollection.findOne({_id:new ObjectId(projectId)});
     if(!requestedProject) {throw "Project Not Found."}
     // requestedProject._id=requestedProject._id.toString();
     return requestedProject;
 };
+export const getAllUserProjects = async(userId) => {    
+    const dbcon = await dbConnection();
+    if(!userId) throw "Invalid User ID"
+    validation.checkString(userId,'User ID')
+    validation.checkId(userId,'User ID')
+     const projects = await dbcon.collection('projects').find({members:new ObjectId(userId)}).toArray();
+     return projects; 
+ 
+ };
 const updateProject=async(projectId,updateProductObject)=>{
-    const projectCollection = await projects();
+    const projectCollection = await dbConnection();
     const project=await  getProject(projectId);
     if(updateProductObject.name){validation.checkString(updateProductObject.name,"projectName");project.name=updateProductObject.name.trim();}
     if(updateProductObject.description){validation.checkString(updateProductObject.description,"Description");project.description=updateProductObject.description.trim()}
@@ -93,7 +101,7 @@ const updateProject=async(projectId,updateProductObject)=>{
 const  deleteProject=async (projectId)=>{
     if (!projectId||!ObjectId.isValid(projectId)) throw 'Invalid project ID';
     validation.checkString(projectId,'projectID');
-    const projectsCollection=await projects();
+    const projectsCollection=await dbConnection();
     const deletingProject=await projectsCollection.findOneAndDelete({_id:new ObjectId(projectId)});
     if(!deletingProject) throw "Project deletion  Failed.";
     return true;

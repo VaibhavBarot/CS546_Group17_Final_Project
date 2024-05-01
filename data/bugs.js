@@ -67,10 +67,8 @@ export const getAllUserBugs = async(userId) => {
     if(!userId) throw "Invalid Project ID"
     validation.checkString(userId,'Project ID')
     validation.checkId(userId,'Project ID')
-     const bugs = await dbcon.collection('bugs').find({members:userId}).toArray();
-     return bugs;
-     // const bugs = await dbcon.collection('')
- 
+     const bugs = await dbcon.collection('bugs').find({members:new ObjectId(userId)}).toArray();
+     return bugs; 
  
  }
 

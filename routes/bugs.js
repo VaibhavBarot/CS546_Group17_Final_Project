@@ -4,9 +4,14 @@ import moment from "moment";
 const router = Router();
 import validation from '../validation.js';
 import { bugData } from '../data/index.js';
+import { getAllUserBugs } from '../data/bugs.js';
 
 router
 .route('/')
+.get(async (req,res) => {
+    const bugs = await getAllUserBugs(req.session.user._id);
+    return res.render('bugPage',{role:req.session.user.role,bugs:bugs})
+})
 .post(async(req, res) =>{
     let{
     title,
