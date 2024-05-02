@@ -1,6 +1,9 @@
 <div class="container">
   {{#eq role 'user'}}
   <p class="h1 text-center my-3 text-bg-dark form-border">Bugs</p>
+    <div class="row justify-content-center">
+        <a href="bugs/createbug" id="create-bug" class="btn btn-success btn-lg my-2 col-md-4">Create Bug</a>
+    </div>
   <div id="filter" class="card column mb-3 text-bg-light">
       <div class="col-md-3">
           <select class="form-select">
@@ -25,7 +28,7 @@
       </div>
       <div class="card-body">
           <p class="card-text">{{description}}</p>
-          <a href="#" class="btn btn-lg btn-primary">View</a>
+          <a href="bugs/{{_id}}" class="btn btn-lg btn-primary">View</a>
       </div>
   </div>
   {{/each}}

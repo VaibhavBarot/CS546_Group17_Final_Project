@@ -5,9 +5,9 @@ import projectRoutes from './projects.js';
 
 
 const constructorMethod = (app) => {
-  app.use('/bugs', bugRoutes);
+  app.use('/projects/:projectId', bugRoutes);
   app.use('/comments', commentRoutes);
-  app.use('/projects',projectRoutes);
+  // app.use('/projects',projectRoutes);
   app.use('/',userRoutes)
 
   app.use('*', (req, res) => {

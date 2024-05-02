@@ -1,13 +1,13 @@
 import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 import moment from "moment";
-const router = Router();
+const router = Router({mergeParams:true});
 import validation from '../validation.js';
 import { bugData } from '../data/index.js';
 import { getAllUserBugs } from '../data/bugs.js';
 
 router
-.route('/')
+.route('/bugs')
 .get(async (req,res) => {
     const bugs = await getAllUserBugs(req.session.user._id);
     return res.render('bugPage',{role:req.session.user.role,bugs:bugs})
@@ -61,7 +61,13 @@ router
 )
 
 router
-.route('/:bugId')
+.route('/bugs/createbug')
+.get(async (req,res) => {
+    return res.render('createbug');
+})
+
+router
+.route('/bugs/:bugId')
 .get(async(req,res) => {
     let bugId = req.params.bugId.trim()
     try{
