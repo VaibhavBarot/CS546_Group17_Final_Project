@@ -124,7 +124,7 @@ const deleteBug = async(bugId) =>{
     //error handling
     validation.checkId(bugId,'BugId')
     const dbcon = await dbConnection()
-    const delete_bug = await getBug(bugId, dbcon)
+    const delete_bug = await getBug(bugId)
     const delete_bug1 = await dbcon.collection('bugs').deleteOne({_id:new ObjectId(bugId)});
     if(delete_bug1.deletedCount === 0)
     {

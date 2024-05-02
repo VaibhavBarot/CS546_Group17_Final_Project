@@ -9,6 +9,7 @@ export const root_middleware = (req,res,next) =>{
         next()
     }
     else{
+        res.locals.isLoggedIn = true;
     next();
     }
 };

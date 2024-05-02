@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import moment from "moment";
 const router = Router({mergeParams:true});
 import validation from '../validation.js';
-import { bugData } from '../data/index.js';
+import { bugData, userData } from '../data/index.js';
 import { getAllUserBugs } from '../data/bugs.js';
 
 router
@@ -75,7 +75,16 @@ router
         validation.checkString(bugId,'BugId')
         validation.checkId(bugId, 'BugId')
         const get_bug1 = await bugData.getBug(bugId)
-        return res.json(get_bug1)
+        const get_users = await userData.getUsers(get_bug1.members)
+        if(get_bug1.assignedTo){
+            const get_assigned_user = await userData.getUsers([get_bug1.assignedTo])
+            get_bug1.assignedTo = get_assigned_user[0]
+        }
+        const get_creator = await userData.getUsers([get_bug1.creator])
+        get_bug1.members = get_users
+
+        get_bug1.creator = get_creator[0]
+        return res.render('bugdetails',get_bug1)
     }
     catch(e)
     {

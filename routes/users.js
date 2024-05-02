@@ -88,6 +88,7 @@ router.route('/login')
         let result = await loginUser(email,password)
         if(!result) return res.status(500).send({error:'Internal Server Error'});
         req.session.user = result;
+        res.locals.isLoggedIn = true;
         return res.redirect('/dashboard');
     }
         catch(e)
@@ -106,6 +107,18 @@ router.route('/dashboard')
     } catch(e){
         console.log(e);
     }
+})
+
+router.route('/logout')
+.get(async(req,res) => {
+    try{
+        req.session.destroy()
+         res.redirect('/login')
+    }
+    catch(e){
+        console.log(e)
+    }
+
 })
 
 export default router;

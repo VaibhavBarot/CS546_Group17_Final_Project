@@ -5,5 +5,12 @@
         <link rel="stylesheet" href="/public/css/styles.css">
         <script src="../../public/js/client_side_validations.js"></script>
     </head>
-    <body>{{{body}}} </body>
+    <body>
+    </body>
+    {{#if isLoggedIn}}
+    <a href="/logout" class="btn btn-dark btn-logout">Logout</a>
+    {{/if}}
+    {{{body}}}
+    
+     </body>
 </html>

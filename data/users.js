@@ -2,6 +2,8 @@ import bcrypt from 'bcryptjs';
 import validation from '../validation.js';
 import {users} from '../config/mongoCollections.js'
 import { dbConnection } from '../config/mongoConnection.js';
+import {ObjectId} from 'mongodb';
+
 
 export const registerUser = async(
     firstName,
@@ -82,3 +84,22 @@ else{
     throw "Either the email or password is invalid"
 }
 }
+
+export const getUsers = async(members_id) =>{
+    const dbcon = await dbConnection()
+
+    const user_details_array = []
+    for(let i = 0; i < members_id.length ; i++){
+        const mem_id = members_id[i]
+        const user_details = await dbcon.collection('users').findOne({_id:new ObjectId(mem_id)})
+        user_details_array.push({firstName:user_details.firstName,
+                                lastName:user_details.lastName,
+                            email:user_details.email}
+                            )
+   
+    }
+    return user_details_array
+
+}
+
+export default{registerUser,loginUser,getUsers}
