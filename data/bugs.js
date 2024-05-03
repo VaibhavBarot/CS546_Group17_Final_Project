@@ -54,7 +54,8 @@ const getAll = async(projectId) => {
    const dbcon = await dbConnection();
    if(!projectId) throw "Invalid Project ID"
    validation.checkString(projectId,'Project ID')
-   validation.checkId(projectId,'Project ID')
+   projectId = validation.checkId(projectId,'Project ID')
+   projectId = new ObjectId(projectId)
     const bugs = await dbcon.collection('bugs').find({projectId:projectId}).toArray()
     return bugs;
     // const bugs = await dbcon.collection('')
@@ -212,6 +213,37 @@ const search =async(searchInput)=>{
     const searchResult = await bugsCollection.find(query).toArray()
     return searchResult
 }
+
+const bugsSummary = async (projectId) =>{
+    let result = {
+        total_bugs: 0,
+        status:{
+
+        'To Do':0,
+        'In Progress': 0,
+        'Completed':0,
+        'In Review':0,
+        'Tesing':0
+        },
+        priority:{
+            'High':0,
+            'Medium':0,
+            'Low':0
+        }
+    }
+    const bugs = await getAll(projectId)
+    result['total_bugs'] = bugs.length
+    for (let bug of bugs){
+        result['status'][bug['status']] +=1
+        result['priority'][bug['priority']] +=1
+    }
+
+    return result
+
+
+}
+
+console.log(await bugsSummary('6633d3dc2380ed6a4e0a963d'))
 // console.log(await filterBugs({'filterStatus':['To Do'],'filterPriority':['High'],'sortBugs':'L2H'},'6633d3dc2380ed6a4e0a963e'))
 // console.log(await search('search'))
 export default {createBug, getAll, getBug, updateBug, deleteBug, getAllUserBugs,filterBugs,search}
