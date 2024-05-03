@@ -14,6 +14,9 @@ const getCollectionFn = (collection) => {
 };
 
 // Note: You will need to change the code below to have the collection required by the assignment!
-export const bugs = getCollectionFn('bugs');
+
+
+// contactsCollection.createIndex({ lastName: 1, firstName: -1 })
 export const projects = getCollectionFn('projects');
 export const users = getCollectionFn('users');
+export const bugs = getCollectionFn('users');

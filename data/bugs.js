@@ -134,4 +134,84 @@ const deleteBug = async(bugId) =>{
     return {_id:delete_bug._id, deleted:true}
 }
 
-export default {createBug, getAll, getBug, updateBug, deleteBug, getAllUserBugs}
+const sortBugs= (order,bugsArray) =>{
+    const HighToLowpriorityOrder = { "High": 1, "Medium": 2, "Low": 3 }
+    const LowToHighpriorityOrder = {  "Low": 1, "Medium": 2, "High": 3 }
+    if (order === 'H2L'){
+        bugsArray.sort((bug1, bug2) => {
+            return HighToLowpriorityOrder[bug1.priority] - HighToLowpriorityOrder[bug2.priority];
+          });
+    }
+    if (order === 'L2H'){
+        bugsArray.sort((bug1, bug2) => {
+            return LowToHighpriorityOrder[bug1.priority] - LowToHighpriorityOrder[bug2.priority];
+          });
+
+    }
+
+
+}
+
+const filterBugs = async(filterParams,projectId) =>{
+    let result = []
+    const dbCon = await dbConnection()
+    const bugsCollection = await dbCon.collection('bugs')
+    validation.checkId(projectId,'projectId')
+    projectId = new ObjectId(projectId)
+
+    if (filterParams === null || typeof filterParams !== 'object'){throw 'Invalid paramters'}
+
+    if(Object.keys(filterParams).length == 1 && filterParams.hasOwnProperty('sortBugs')){
+        let bugs = await getAll(projectId)
+        if (filterParams['sortBugs'] === 'H2L'){sortBugs('H2L',bugs)}
+        else if (filterParams['sortBugs'] === 'L2H'){sortBugs('L2H',bugs)}
+        else{throw 'Invalid sorting type'}
+        return bugs
+    }
+    if(filterParams.hasOwnProperty(['filterStatus']) && filterParams.hasOwnProperty(['filterPriority'])){
+        filterParams['filterStatus'] = validation.checkStringArray(filterParams['filterStatus'],'Filter status')
+        filterParams['filterPriority'] = validation.checkStringArray(filterParams['filterPriority'],'Filter Priority')
+        filterParams['filterStatus'].forEach(element => { validation.checkStatus(element)})
+        filterParams['filterPriority'].forEach(element => { validation.checkPriority(element)})
+        result = await bugsCollection.find({priority:{$in:filterParams['filterPriority']},status:{$in:filterParams['filterStatus']},projectId:projectId}).toArray()
+    }
+    
+    else if (filterParams.hasOwnProperty(['filterStatus'])){
+        filterParams['filterStatus'] = validation.checkStringArray(filterParams['filterStatus'],'Filter status')
+        filterParams['filterStatus'].forEach(element => { validation.checkStatus(element)})
+
+            result = await bugsCollection.find({ status: { $in: filterParams['filterStatus'] },projectId:projectId }).toArray()          
+        
+    }
+    else if (filterParams.hasOwnProperty(['filterPriority'])){
+        filterParams['filterPriority'] = validation.checkStringArray(filterParams['filterPriority'],'Filter Priority')
+        filterParams['filterPriority'].forEach(element => { validation.checkStatus(element)})
+        
+            result = await bugsCollection.find({priority:{$in:filterParams['filterPriority']},projectId:projectId}).toArray()
+                
+    }
+
+    if (filterParams.hasOwnProperty(['sortBugs'])){
+        if (filterParams['sortBugs'] === 'H2L'){sortBugs('H2L',result)}
+        else if (filterParams['sortBugs'] === 'L2H'){sortBugs('L2H',result)}
+        else{throw 'Invalid sort type'}
+
+        }
+
+
+    return result
+
+
+
+}
+
+const search =async(searchInput)=>{
+    const query = { $text: { $search: `\"${searchInput}\"` } };
+    const dbCon = await dbConnection()
+    const bugsCollection = await dbCon.collection('bugs')
+    const searchResult = await bugsCollection.find(query).toArray()
+    return searchResult
+}
+// console.log(await filterBugs({'filterStatus':['To Do'],'filterPriority':['High'],'sortBugs':'L2H'},'6633d3dc2380ed6a4e0a963e'))
+// console.log(await search('search'))
+export default {createBug, getAll, getBug, updateBug, deleteBug, getAllUserBugs,filterBugs,search}
