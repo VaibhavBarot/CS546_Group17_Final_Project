@@ -1,4 +1,5 @@
 import { dbConnection, closeConnection } from "./config/mongoConnection.js";
+import {bugs as bugc,projects as projectsc} from './config/mongoCollections.js'
 import bcrypt from 'bcryptjs';
 
 let users,projects,bugs
@@ -114,8 +115,26 @@ const dummyBugData = (users,projects) => { return [
       console.error("Error inserting documents:", error);
     }
   };
+
+  const createIndex = async () =>{
+    try{
+      const bugsCollection = await bugc()
+      const projectCollection = await projectsc()
+      const result = await bugsCollection.createIndex({ title: "text",description:"text" },{ default_language: "english" });
+      const projectIndex = await projectCollection.createIndex({ name: "text",description:"text" },{ default_language: "english" });
+
+      
+
+    }
+    catch (err){
+      console.log("Error Creating index")
+    }
+  }
   
   // Call function to insert dummy data
-  insertDummyData();
+  // await insertDummyData();
+  await createIndex()
+
+  console.log("Seed Completed")
 
   

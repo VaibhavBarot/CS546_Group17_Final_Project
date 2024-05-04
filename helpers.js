@@ -15,6 +15,9 @@ const exportedHelpers = {
             }
             break;
         }
+    },
+    ternary:function(error){
+      return (error) ? true : false
     }
 }
 

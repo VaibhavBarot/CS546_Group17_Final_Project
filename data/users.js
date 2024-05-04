@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import validation from '../validation.js';
 import {users} from '../config/mongoCollections.js'
-import { dbConnection } from '../config/mongoConnection.js';
 import {ObjectId} from 'mongodb';
 
 
@@ -13,7 +12,7 @@ export const registerUser = async(
     role
 ) =>{
 
-    const dbcon = await dbConnection()
+    const usersCollection = await users()
     let reg_user = {fname:firstName, lname:lastName, email:email, password:password, role:role}
 //   if(!firstName || !lastName || !username || !email || !password) throw "All fields must be supplied"
 const fields = [
@@ -30,7 +29,7 @@ for (const field of fields) {
 }
   validation.checkUser(reg_user)
 
- const user = await dbcon.collection('users').findOne({email});
+ const user = await usersCollection.findOne({email});
 
  if(user)
  {
@@ -44,7 +43,7 @@ validation.checkEmail(email);
  const hashed_password = await bcrypt.hash(password, 10)
  password = hashed_password
 
- const create_user = await dbcon.collection('users').insertOne({
+ const create_user = await usersCollection.insertOne({
     firstName,
     lastName,
     email,
@@ -68,9 +67,9 @@ export const loginUser = async(email, password)=>{
 
 password = validation.checkString(password,'password')
 validation.checkPassword(password,'Password')
-
- const dbcon = await dbConnection()
- const user = await dbcon.collection('users').findOne({email});
+const usersCollection = await users()
+ 
+ const user = await usersCollection.findOne({email});
 
  if(!user)
  {
@@ -86,12 +85,12 @@ else{
 }
 
 export const getUsers = async(members_id) =>{
-    const dbcon = await dbConnection()
+    const usersCollection = await users()
 
     const user_details_array = []
     for(let i = 0; i < members_id.length ; i++){
         const mem_id = members_id[i]
-        const user_details = await dbcon.collection('users').findOne({_id:new ObjectId(mem_id)})
+        const user_details = await usersCollection.findOne({_id:new ObjectId(mem_id)})
         user_details_array.push({firstName:user_details.firstName,
                                 lastName:user_details.lastName,
                             email:user_details.email}
