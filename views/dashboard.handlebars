@@ -1,4 +1,4 @@
-<div class="container">
+<div id="dashboard" class="container">
     <p class="h1 text-center my-3 text-bg-dark form-border">Software Packages</p>
     <div id="filter" class="card column mb-3 text-bg-light">
         <div class="controls col-md-8">
@@ -9,11 +9,14 @@
             <div class="spinner-border"></div>
         </div>
     </div>
+    <div id="softwares">
     {{#each packages}}
         <div class="card text-center text-bg-secondary mb-3">
         <div class="card-header h3">
             {{name}}
-            <span class="badge bg-secondary float-end">{{status}}</span>
+            {{#eq ../user.role 'manager'}}
+            <button class="badge bg-danger float-end delete-button" data-id="{{_id}}">Delete</button>
+            {{/eq}}
         </div>
         <div class="card-body">
             <p class="card-text">{{description}}</p>
@@ -21,4 +24,5 @@
         </div>
     </div>
     {{/each}}
+    </div>
 </div>

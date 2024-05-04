@@ -1,8 +1,10 @@
 document.addEventListener('DOMContentLoaded',function(){
+    const $ = window.jQuery;
     const signup_form = document.getElementById('signup-form')
     const signin_form = document.getElementById('signin-form')
     const create_manager_signup_form = document.getElementById('create-manager-signup-form')
     const create_devtest_signup_form = document.getElementById('create-devtest-signup-form')
+    const dashboard = document.getElementById('dashboard');
 
     const client_validations = {
   
@@ -53,6 +55,10 @@ document.addEventListener('DOMContentLoaded',function(){
         {
            signup_form.addEventListener('submit',function(event){
             let errors = [];
+            const errorDiv = document.getElementById('error')
+            if(errorDiv){
+                errorDiv.innerHTML = ''
+            }
             event.preventDefault();
 
             try{
@@ -101,6 +107,13 @@ document.addEventListener('DOMContentLoaded',function(){
          } 
             if(errors.length > 0){
                 let errorDiv = document.getElementById('error');
+                if(!errorDiv){
+                    errorDiv = document.createElement('div')
+                    errorDiv.setAttribute('id','error')
+                    errorDiv.classList.add('alert')
+                    errorDiv.classList.add('alert-danger');
+                    document.getElementById('container').appendChild(errorDiv)
+                }
                 errorDiv.classList.remove('invisible');
                 errorDiv.innerHTML = ''
                 return errors.forEach(error => {
@@ -118,6 +131,10 @@ document.addEventListener('DOMContentLoaded',function(){
         {
             signin_form.addEventListener('submit',function(event){
                 let errors = [];
+                const errorDiv = document.getElementById('error')
+                if(errorDiv){
+                    errorDiv.innerHTML = ''
+                }
                 event.preventDefault();
                 try{
                     email = document.getElementById('email').value.trim().toLowerCase()
@@ -138,6 +155,13 @@ document.addEventListener('DOMContentLoaded',function(){
                 }
                 if(errors.length > 0){
                     let errorDiv = document.getElementById('error');
+                    if(!errorDiv){
+                        errorDiv = document.createElement('div')
+                        errorDiv.setAttribute('id','error')
+                        errorDiv.classList.add('alert')
+                        errorDiv.classList.add('alert-danger');
+                        document.getElementById('container').appendChild(errorDiv)
+                    }
                     errorDiv.classList.remove('invisible');
                     errorDiv.innerHTML = ''
                     return errors.forEach(error => {
@@ -152,6 +176,10 @@ document.addEventListener('DOMContentLoaded',function(){
         if(create_manager_signup_form){
             create_manager_signup_form.addEventListener('submit',function(event){
                 let errors = [];
+                const errorDiv = document.getElementById('error')
+                if(errorDiv){
+                    errorDiv.innerHTML = ''
+                }
                 event.preventDefault();
     
                 try{
@@ -201,6 +229,13 @@ document.addEventListener('DOMContentLoaded',function(){
              
                 if(errors.length > 0){
                     let errorDiv = document.getElementById('error');
+                    if(!errorDiv){
+                        errorDiv = document.createElement('div')
+                        errorDiv.setAttribute('id','error')
+                        errorDiv.classList.add('alert')
+                        errorDiv.classList.add('alert-danger');
+                        document.getElementById('container').appendChild(errorDiv)
+                    }
                     errorDiv.classList.remove('invisible');
                     errorDiv.innerHTML = ''
                     return errors.forEach(error => {
@@ -217,6 +252,10 @@ document.addEventListener('DOMContentLoaded',function(){
         if(create_devtest_signup_form){
             create_devtest_signup_form.addEventListener('submit',function(event){
                 let errors = [];
+                const errorDiv = document.getElementById('error')
+                if(errorDiv){
+                    errorDiv.innerHTML = ''
+                }
                 event.preventDefault();
     
                 try{
@@ -266,6 +305,13 @@ document.addEventListener('DOMContentLoaded',function(){
              
                 if(errors.length > 0){
                     let errorDiv = document.getElementById('error');
+                    if(!errorDiv){
+                        errorDiv = document.createElement('div')
+                        errorDiv.setAttribute('id','error')
+                        errorDiv.classList.add('alert')
+                        errorDiv.classList.add('alert-danger');
+                        document.getElementById('container').appendChild(errorDiv)
+                    }
                     errorDiv.classList.remove('invisible');
                     errorDiv.innerHTML = ''
                     return errors.forEach(error => {
@@ -278,5 +324,44 @@ document.addEventListener('DOMContentLoaded',function(){
                
                })
         }
+
+        if(dashboard){
+            $('.delete-button').each(function() {
+                const projectId = $(this).attr('data-id')
+                console.log($(this))
+                $(this).on('click', (ev) => {
+                    $.ajax({
+                        method:'DELETE',
+                        url:`http://localhost:3000/projects/${projectId}`,
+                        data: {_id:projectId}
+                    })
+                    .done(() => window.location.reload)
+                })
+            })
+
+            $('#search').on('click', (ev) => {
+                const searchText = $('#event-name').val();
+                // do error handling
+                $.post('http://localhost:3000/projects/searchprojects', {searchText:searchText}, (data) => {
+                    $('#softwares').empty();
+                    data.forEach((project) => {
+                        $('#softwares').append(`<div class="card text-center text-bg-secondary mb-3">
+                            <div class="card-header h3">
+                                ${project.name}
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">${project.description}</p>
+                                <a href="/projects/${project._id}/bugs" class="btn btn-lg btn-primary">View</a>
+                            </div>
+                        </div>`)
+                    })
+                })
+            })
+        }
+        // if('createBug-form'){
+        //     const bugName = document.getElementById('bug-name').value().trim()
+        //     const bugDescription = document.getElementById('bug-description').value().trim()
+        //     if(bugName.length == 0 || bugDescription.length == 0){}
+        // }
 
 });

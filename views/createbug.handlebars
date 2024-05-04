@@ -1,10 +1,10 @@
 <div class="container">
     <p class="h1 text-center my-2 text-bg-dark form-border">Create Bug</p>
-    <form id="signup-form" class="row form-border p-2 g-3 mt-2" method="post" action="/register">
+    <form id="createBug-form" class="row form-border p-2 g-3 mt-2" method="post" action="createbug">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <label for="bug-name" class="form-label">Title</label>
-                <input type="text" class="form-control" id="bug-name" name="bug-name">
+                <label for="name" class="form-label">Title</label>
+                <input type="text" class="form-control" id="bug-name" name="name">
             </div>
         </div>
         <div class="col-md-12">
@@ -12,9 +12,10 @@
             <textarea class="form-control" id="bug-description" name="bug-description" rows="3"></textarea>
         </div>
 
+        {{#isnt user.role 'user'}}
         <div class="col-md-6">
-            <label for="bug-status" class="form-label">Status</label>
-            <select class="form-select" name="bug-status">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" name="status">
                 <option value="todo" selected>To Do</option>
                 <option value="inprogress">In Review</option>
                 <option value="inprogress">In Progress</option>
@@ -24,24 +25,29 @@
         </div>
 
         <div class="col-md-6">
-            <label for="bug-priority" class="form-label">Priority</label>
-            <select class="form-select" name="bug-priority">
+            <label for="priority" class="form-label">Priority</label>
+            <select class="form-select" name="priority">
                 <option value="high" selected>High</option>
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
             </select>
-        </div>
+    </div>
 
+        {{#eq user.role 'manager'}}
         <div class="row justify-content-center my-2">
             <div class="col-md-6">
-                <label for="bug-members" class="form-label">Members</label>
-                <select class="form-select" name="bug-members">
-                    <option selected>Add Members</option>
-                    <option value="high">Member1</option>
-                    <option value="medium">Member2</option>
-                    <option value="low">Member3</option>
+                <label for="members" class="form-label">Members</label>
+                <select multiple class="form-select" name="members">
+                    {{#each members}}
+                    <option value="{{email}}">{{firstName}} {{lastName}} | {{email}}</option>
+                    {{/each}}
                 </select>
             </div>
+        </div>
+        {{/eq}}
+        {{/isnt}}
+        <div class="row justify-content-center">
+            <button type="submit" class="col-md-4 btn btn-dark">Submit</button>
         </div>
     </form>
 </div>
