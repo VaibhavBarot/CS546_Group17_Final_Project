@@ -4,11 +4,12 @@ import{commentsData} from '../data/index.js';
 import { ObjectId } from "mongodb";
 import moment from 'moment';
 import validation from '../validation.js'
+import xss from "xss";
 router
 .route('/:bugId')
 .post(async(req,res)=> {
     let bugId = req.params.bugId.trim()
-    let {timestamp, content, userId, files} = req.body
+    let {timestamp, content, userId, files} = req.body.forEach(element => {xss(element)});
     try{
         
         let create_comment1 = {bugId:bugId, userId:userId, timestamp:timestamp, content:content, files:files}

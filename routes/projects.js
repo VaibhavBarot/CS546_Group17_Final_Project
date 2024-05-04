@@ -2,6 +2,7 @@ import {Router} from 'express';
 import {projectData} from "../data/index.js";
 import validation from '../validation.js';
 import { ObjectId } from 'mongodb';
+import xss from  'xss';
 const router = Router();
 
 router
@@ -16,7 +17,11 @@ router
     }catch(e){return res.status(404).json({error: e})}; 
 })
 .post(async(req,res)=>{
-    const {name,description,creator,members}= req.body;
+    const name=xss(req.body.name);
+    const  description=xss(req.body.description);
+    const creator=xss(req.body.creator);
+    const members=xss(req.body.members);
+    // const {name,description,creator,members}= req.body;
     try{
         if(!name || !description || !creator || !members){
             throw "All  fields must be filled out.";

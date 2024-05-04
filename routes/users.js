@@ -4,7 +4,7 @@ import {getAllUserBugs} from '../data/bugs.js';
 import validation from '../validation.js';
 import moment from 'moment';
 import { getAllUserProjects } from '../data/projects.js';
-
+import xss from "xss";
 const router = Router()
 router.route('/').get(async(req,res) => {
     return res.json({error: 'YOU SHOULD NOT BE HERE!'});
@@ -17,7 +17,13 @@ router.route('/register')
 
 .post(async(req,res) => {
     try{
-        let {fname,lname,email,password,confirmPassword,role} = req.body;
+        let fname=xss(req.body.fname);
+        let lname=xss(req.body.lname);
+        let  email=xss(req.body.email);
+        let password=xss(req.body.password);
+        let confirmPassword=xss(req.body.confirmPassword);
+        let role=xss(req.body.role);
+        // let {fname,lname,email,password,confirmPassword,role} = req.body;
 
         // if(!fname || !lname || !email || !password || !role) throw "All fields must be supplied";
         const fields = [
@@ -47,7 +53,7 @@ router.route('/register')
 
         req.session.user = result;
 
-        return res.redirect('/dashboard');
+        return res.redirect('/login');
     } catch(e){
         console.log(e);
     }
@@ -69,8 +75,10 @@ router.route('/login')
     return res.render('login',{title:"login"})
  })
 .post(async(req,res)=>{
-    let {email,password} = req.body
-   
+
+    // let {email,password} = req.body
+    let email=xss(req.body.email);
+    let password=xss(req.body.password); 
     try{
         if(!email || !password){
             return res.status(400).render('login',{error:true,msg:'Both email and password are required.'})

@@ -24,7 +24,9 @@ router
     projectId,
     estimatedTime,
     createdAt,
-    } = req.body
+    } = req.body.forEach(element => {xss(element)
+        
+    });
 
     try{
         if(!title || !description || !creator || !status || !priority || !assignedTo || !members || !projectId || !estimatedTime || !createdAt)
