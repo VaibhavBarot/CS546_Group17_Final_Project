@@ -52,6 +52,7 @@ const exportedMethods = {
     //if it's not empty, we will make sure all tags are strings
     if (!arr || !Array.isArray(arr))
       throw `You must provide an array of ${varName}`;
+    if(arr.length===0) throw `${varName} cannot be empty`;
     for (let i in arr) {
       if (typeof arr[i] !== 'string' || arr[i].trim().length === 0) {
         throw `One or more elements in ${varName} array is not a string or is an empty string`;
@@ -60,6 +61,50 @@ const exportedMethods = {
     }
 
     return arr;
+  },
+  validateMembers(arr, varName) {
+    //we will make sure all members are strings and of valid ObjectId type.
+    if (!arr || !Array.isArray(arr))
+    throw `You must provide an array of ${varName}`;
+    if(arr.length===0) throw `${varName} cannot be empty`;
+    for (let i in arr) {
+      if (typeof arr[i] !== 'string' || arr[i].trim().length === 0 || !ObjectId.isValid(arr[i])) {
+        throw `One or more elements in ${varName} array is not a string or is an empty string`;
+      }
+      arr[i] = arr[i].trim();
+    }
+
+  return arr;
+  },
+
+  checkEmail(email){
+    if(!(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email))) throw "Invalid email address";
+  },
+
+  checkUser(user){
+    let {fname,lname,email,password,role} = user;
+    fname = this.checkString(fname, 'First Name');
+    this.checkName(fname);
+    lname = this.checkString(lname, 'Last Name');
+    this.checkName(lname);
+    email = this.checkString(email, 'Email');
+    //this.checkEmail(email);
+    password = this.checkString(password, 'Password');
+    role = this.checkString(role, 'Role');
+
+    return {fname,lname,email,password,role};
+  },
+
+  checkName(strVal, varName){
+    if(strVal.length < 2 || strVal.length > 25 || /\d/.test(strVal)) throw `Invalid ${varName} `
+  },
+
+  checkPassword(strVal, varName){
+    if(strVal.length < 8 ) throw `Error: ${varName} must be of 8 characters minimum`
+    const password_regex =  /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+    if(!password_regex.test(strVal)){
+        throw `Invalid Password format ${varName} . Password must contain at least one number and there has to be at least one special character`
+    }
   },
 
   checkBug(updateObject){

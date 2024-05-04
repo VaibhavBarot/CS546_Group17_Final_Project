@@ -2,7 +2,8 @@
 
 import nodemailer from 'nodemailer';
 import 'dotenv/config';
-
+let email = process.env.EMAIL
+let pass = process.env.PASSWORD
 console.log(email,pass)
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -13,7 +14,7 @@ var transporter = nodemailer.createTransport({
 });
 
 // TODO: Throw error if email not sent!!!
-const sendMail = (recieverMail,subject,msg)=>{
+const sendEMail = (recieverMail,subject,msg)=>{
     var mailOptions = {
         from: email,
         to: recieverMail,
@@ -30,4 +31,21 @@ const sendMail = (recieverMail,subject,msg)=>{
       });
 }
 
-// sendMail('rahuldoshi34@gmail.com','done','hiii')
+
+// var nodemailer = require('nodemailer');
+var transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'bugtracker17@gmail.com',
+        pass: 'dsnf arcs ocgp civb'
+    }
+});
+
+transporter.sendMail({
+from: 'bugtracker17@gmail.com',
+  to: 'rahuldoshi34@gmail.com',
+  subject: 'hello world!',
+  text: 'hello world!'
+});
+
+// sendEMail('rahuldoshi34@gmail.com','done','hiii')

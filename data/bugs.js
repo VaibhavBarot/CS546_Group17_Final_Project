@@ -62,6 +62,16 @@ const getAll = async(projectId) => {
 
 }
 
+export const getAllUserBugs = async(userId) => {    
+    const dbcon = await dbConnection();
+    if(!userId) throw "Invalid Project ID"
+    validation.checkString(userId,'Project ID')
+    validation.checkId(userId,'Project ID')
+     const bugs = await dbcon.collection('bugs').find({members:new ObjectId(userId)}).toArray();
+     return bugs; 
+ 
+ }
+
 const getBug = async(bugId) => {   
     const dbcon = await dbConnection();
     if(!bugId) throw "Invalid bug Id"
@@ -114,7 +124,7 @@ const deleteBug = async(bugId) =>{
     //error handling
     validation.checkId(bugId,'BugId')
     const dbcon = await dbConnection()
-    const delete_bug = await getBug(bugId, dbcon)
+    const delete_bug = await getBug(bugId)
     const delete_bug1 = await dbcon.collection('bugs').deleteOne({_id:new ObjectId(bugId)});
     if(delete_bug1.deletedCount === 0)
     {
@@ -124,4 +134,4 @@ const deleteBug = async(bugId) =>{
     return {_id:delete_bug._id, deleted:true}
 }
 
-export default {createBug,getAll,getBug, updateBug, deleteBug}
+export default {createBug, getAll, getBug, updateBug, deleteBug, getAllUserBugs}
