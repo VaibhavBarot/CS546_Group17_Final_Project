@@ -90,8 +90,8 @@ const exportedMethods = {
     email = this.checkString(email, 'Email');
     //this.checkEmail(email);
     password = this.checkString(password, 'Password');
-    role = this.checkString(role, 'Role');
-
+    role = this.checkString(role, 'Role'); 
+   
     return {fname,lname,email,password,role};
   },
 

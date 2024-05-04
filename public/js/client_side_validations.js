@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded',function(){
     const signin_form = document.getElementById('signin-form')
     const create_manager_signup_form = document.getElementById('create-manager-signup-form')
     const create_devtest_signup_form = document.getElementById('create-devtest-signup-form')
+    const reset_password = document.getElementById('reset-password')
     const dashboard = document.getElementById('dashboard');
 
     const client_validations = {
@@ -293,6 +294,49 @@ document.addEventListener('DOMContentLoaded',function(){
                     })
                     .done(() => window.location.reload)
                 })
+            })
+        }
+
+        if(reset_password){
+            reset_password.addEventListener('submit',function(event){
+                let errors = []
+                event.preventDefault();
+                try{
+                    oldPassword = document.getElementById('oldPassword').value.trim()
+                    oldPassword = client_validations.checkString(oldPassword,'Old Password')
+                    client_validations.checkPassword(oldPassword,'Old Password')
+                }
+                catch(e){
+                    errors.push(e)
+                }
+                try{
+                    newPassword = document.getElementById('newPassword').value.trim()
+                    newPassword = client_validations.checkString(newPassword,'New Password')
+                    client_validations.checkPassword(newPassword,'New Password')
+                }
+                catch(e){
+                    errors.push(e)
+                }
+                if(errors.length > 0){
+                    let errorDiv = document.getElementById('error');
+                    errorDiv.classList.remove('invisible');
+                    errorDiv.innerHTML = ''
+                    return errors.forEach(error => {
+                        let p = document.createElement('p')
+                        p.innerText = error;
+                        errorDiv.appendChild(p);
+                    })
+                }
+                reset_password.submit()
+                // $('#reset-password').on('submit', (ev) => {
+                //     $.ajax({
+                //         type: 'PATCH',
+                //         url: 'http://localhost:3000/firstLogin',
+                //         data: JSON.stringify({email:email,oldPassword:oldPassword,newPassword:newPassword}),
+                //         processData: false,
+                //         contentType: 'application/merge-patch+json',                    
+                //      })
+                // })
             })
         }
 
