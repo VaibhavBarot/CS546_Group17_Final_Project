@@ -10,6 +10,7 @@ export const root_middleware = (req,res,next) =>{
     }
     else{
         res.locals.isLoggedIn = true;
+        res.locals.user = req.session.user;
     next();
     }
 };

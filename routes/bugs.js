@@ -1,10 +1,13 @@
 import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 import moment from "moment";
-const router = Router({mergeParams:true});
 import validation from '../validation.js';
 import { bugData, userData } from '../data/index.js';
 import { getAllUserBugs } from '../data/bugs.js';
+import { projectData } from '../data/index.js';
+import { getUsers } from '../data/users.js';
+
+const router = Router({mergeParams:true});
 
 router
 .route('/bugs')
@@ -63,7 +66,13 @@ router
 router
 .route('/bugs/createbug')
 .get(async (req,res) => {
-    return res.render('createbug');
+    const project = await projectData.getProject(req.params.projectId);
+    project.members = await getUsers(project.members);
+    return res.render('createbug', {members:project.members});
+})
+.post(async (req,res) => {
+    const {title, description, status, priority, members} = req.body;
+    //await bugData.createBug()
 })
 
 router

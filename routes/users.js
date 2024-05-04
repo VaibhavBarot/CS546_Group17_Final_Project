@@ -103,7 +103,7 @@ router.route('/dashboard')
 .get(async (req, res) => {
     try{
         const result = await getAllUserProjects(req.session.user._id);
-        return res.render('dashboard',{role:'user',packages:result});
+        return res.render('dashboard',{packages:result});
     } catch(e){
         console.log(e);
     }

@@ -1,8 +1,10 @@
 document.addEventListener('DOMContentLoaded',function(){
+    const $ = window.jQuery;
     const signup_form = document.getElementById('signup-form')
     const signin_form = document.getElementById('signin-form')
     const create_manager_signup_form = document.getElementById('create-manager-signup-form')
     const create_devtest_signup_form = document.getElementById('create-devtest-signup-form')
+    const dashboard = document.getElementById('dashboard');
 
     const client_validations = {
   
@@ -277,6 +279,21 @@ document.addEventListener('DOMContentLoaded',function(){
                 create_devtest_signup_form.submit()
                
                })
+        }
+
+        if(dashboard){
+            $('.delete-button').each(function() {
+                const projectId = $(this).attr('data-id')
+                console.log($(this))
+                $(this).on('click', (ev) => {
+                    $.ajax({
+                        method:'DELETE',
+                        url:`http://localhost:3000/projects/${projectId}`,
+                        data: {_id:projectId}
+                    })
+                    .done(() => window.location.reload)
+                })
+            })
         }
 
 });
