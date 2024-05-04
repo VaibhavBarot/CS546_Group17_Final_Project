@@ -3,7 +3,7 @@ import { registerUser, loginUser } from '../data/users.js';
 import {getAllUserBugs} from '../data/bugs.js';
 import validation from '../validation.js';
 import moment from 'moment';
-import { getAllUserProjects } from '../data/projects.js';
+import { getAllUserProjects,getAllProjects } from '../data/projects.js';
 
 const router = Router()
 router.route('/').get(async(req,res) => {
@@ -45,11 +45,9 @@ router.route('/register')
 
         if(!result) return res.status(500).send({error:'Internal Server Error'});
 
-        req.session.user = result;
-
         return res.redirect('/dashboard');
     } catch(e){
-        console.log(e);
+        res.status(400).render('register',{error:true,msg:e})
     }
 })
 
@@ -93,7 +91,8 @@ router.route('/login')
     }
         catch(e)
         {
-            console.log(e)
+            res.status(400).render('login',{error:true,msg:e})
+            
         }
 
     
@@ -102,7 +101,10 @@ router.route('/login')
 router.route('/dashboard')
 .get(async (req, res) => {
     try{
-        const result = await getAllUserProjects(req.session.user._id);
+
+        const result = (req.session.user.role === 'user') ? 
+        await getAllProjects(): 
+        await getAllUserProjects(req.session.user._id) 
         return res.render('dashboard',{packages:result});
     } catch(e){
         console.log(e);

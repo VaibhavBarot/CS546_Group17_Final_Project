@@ -1,4 +1,4 @@
-<div class = "container">
+<div id="container" class = "container">
     
 <p class="h1 text-center my-2 text-bg-dark form-border">Login</p>
    <form id="signin-form" class="row form-border p-2 g-3 mt-2 justify-content-center" method="POST" action="/login">
@@ -31,11 +31,6 @@
         </div>
         
    </form>
-   <div id="error" class="alert alert-danger invisible" role="alert">
-    {{#if error}}
-    <p>{{msg}}</p>
-    {{/if}}
-   </div>
    <p><a href="/register">New User? Click here to register!</a></p>
 </div>
 
