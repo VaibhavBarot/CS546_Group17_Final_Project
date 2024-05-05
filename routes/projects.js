@@ -17,7 +17,11 @@ router
     }catch(e){return res.status(404).json({error: e})}; 
 })
 .post(async(req,res)=>{
-    const {name,description,creator,members}= req.body;
+    let name=xss(req.body.name);
+    let description=xss(req.body.description);
+    let creator=xss(req.body.creator);
+    let members=xss(req.body.members);
+    // const {name,description,creator,members}= req.body;
     try{
         if(!name || !description || !creator || !members){
             throw "All  fields must be filled out.";
@@ -69,16 +73,41 @@ router
       return res.status(200).json(ans);
     }catch(e){return res.status(404).json({error: e.toString()});};
     })
+    
+router
+.route('/addMember')
+.post(async(req,res)=>{
+    const memberEmail=req.body.memberEmail;
+    const projectId=req.body.projectId;
+    // if(!projectId||!memberId||!ObjectId.isValid(projectId)||!ObjectId.isValid(memberId)){return res.status(400).json('No Id or Invalid Id provided');}
+    try{
+        let data=await projectData.addMember(projectId,memberEmail);
+        return res.status(200).json(data);
+    }catch(e){
+        return res.status(400).json({error: e.toString()});
+    }
+})
 
-    router
-    .route('/searchprojects')
-    .post(async (req,res) => {
-        try{
-            const {searchText} = req.body;
-            const projects = await searchProjects(searchText);
-            return res.json(projects);
-        } catch(e){
-            res.status(400).json({e:'Error in search'})
-        }
-    })
+router
+.route('/searchprojects')
+.post(async (req,res) => {
+    try{
+        const {searchText} = req.body;
+        const projects = await searchProjects(searchText);
+        return res.json(projects);
+    } catch(e){
+        res.status(400).json({e:'Error in search'})
+    }
+})
+// .delete(async(req,res)=>{
+//     const memberEmail=req.body.memberEmail;
+//     const projectId=req.body.projectId;
+//     // if(!projectId||!memberId){return res.status(400).json('No Id or Invalid Id provided');}
+//     try{
+//         let data=await projectData.deleteMember(projectId,memberEmail);
+//         return res.status(200).json(data);
+//     }catch(e){
+//         return res.status(400).json({error: e.toString()});
+//     }
+// })
 export default router;

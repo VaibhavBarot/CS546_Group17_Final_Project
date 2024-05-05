@@ -4,6 +4,7 @@ import moment from "moment";
 import validation from '../validation.js';
 import { bugData, userData } from '../data/index.js';
 import { getAllUserBugs } from '../data/bugs.js';
+import xss from 'xss';
 import { projectData } from '../data/index.js';
 import { getUsers } from '../data/users.js';
 
@@ -16,19 +17,28 @@ router
     return res.render('bugPage',{role:req.session.user.role,bugs:bugs})
 })
 .post(async(req, res) =>{
-    let{
-    title,
-    description,
-    creator,
-    status,
-    priority,
-    assignedTo,
-    members,
-    projectId,
-    estimatedTime,
-    createdAt,
-    } = req.body
-
+    // let{
+    // title,
+    // description,
+    // creator,
+    // status,
+    // priority,
+    // assignedTo,
+    // members,
+    // projectId,
+    // estimatedTime,
+    // createdAt,
+    // } = req.body
+    let title=xss(req.body.title);
+    let description=xss(req.body.description);
+    let creator=xss(req.body.creator);
+    let status=xss(req.body.status);
+    let priority=xss(req.body.priority);
+    let assignedTo=xss(req.body.assignedTo);
+    let members=xss(req.body.members);
+    let projectId=xss(req.body.projectId);
+    let estimatedTime=xss(req.body.estimatedTime);
+    let createdAt=xss(req.body.createdAt);
     try{
         if(!title || !description || !creator || !status || !priority || !assignedTo || !members || !projectId || !estimatedTime || !createdAt)
     {
