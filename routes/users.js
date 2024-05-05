@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import { registerUser, loginUser } from '../data/users.js';
+import { registerUser, loginUser, updatePassword} from '../data/users.js';
 import {getAllUserBugs} from '../data/bugs.js';
 import validation from '../validation.js';
 import moment from 'moment';
@@ -26,7 +26,7 @@ router.route('/register')
             { value: email, name: 'Email' },
             { value: password, name: 'Password' },
             { value: confirmPassword, name:'Confirm Password'},
-            { value: role, name: 'Role'}
+            { value: role, name: 'Role'},            
         ];
         
         for (const field of fields) {
@@ -45,7 +45,7 @@ router.route('/register')
 
         if(!result) return res.status(500).send({error:'Internal Server Error'});
 
-        return res.redirect('/dashboard');
+        return res.redirect('/login');
     } catch(e){
         res.status(400).render('register',{error:true,msg:e})
     }
@@ -76,7 +76,7 @@ router.route('/login')
     
       
             email = email.toLowerCase()
-        email = validation.checkString(email,'Email')
+            email = validation.checkString(email,'Email')
         // validation.checkEmail(email)
         
             password = validation.checkString(password,'password')
@@ -86,8 +86,14 @@ router.route('/login')
         let result = await loginUser(email,password)
         if(!result) return res.status(500).send({error:'Internal Server Error'});
         req.session.user = result;
-        res.locals.isLoggedIn = true;
-        return res.redirect('/dashboard');
+        if(req.session.user.firstLogin)
+        {
+            return res.redirect('/firstLogin')
+        }
+        else{
+            res.locals.isLoggedIn = true;
+            return res.redirect('/dashboard');
+        }   
     }
         catch(e)
         {
@@ -97,6 +103,32 @@ router.route('/login')
 
     
 }) 
+router.route('/firstLogin')
+.get(async(req,res)=>{
+    return res.render('firstLogin')
+})
+.post(async(req,res)=>{
+    // console.log("Innnnnn")
+    let {email,oldPassword,newPassword} = req.body
+    try{
+        if(!oldPassword || !newPassword ){
+            return res.status(400).render('firstLogin',{error:true})
+          }
+            email = req.session.user.email
+            email = validation.checkString(email,'Email')
+            oldPassword = validation.checkString(oldPassword,'Old Password')
+            validation.checkPassword(oldPassword,'Old Password')
+            newPassword = validation.checkString(newPassword,'New Password')
+            validation.checkPassword(newPassword,'New Password')
+            await updatePassword(email, oldPassword, newPassword);
+            req.session.user.firstLogin = false;
+            return res.redirect('/dashboard')
+
+    }
+    catch(e){
+        console.log(e)
+    }
+})
 
 router.route('/dashboard')
 .get(async (req, res) => {
