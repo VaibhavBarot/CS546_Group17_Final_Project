@@ -1,42 +1,91 @@
-<div class="container">
+<div id="bug-details-form" class="container">
     <p class="h1 text-center my-2 text-primary form-border">Bug Details</p>
-    <div class="row">
+    <div class="row gy-2">
         <div class="col-md-12">
-            <p class="h3"><span class="font-weight-bold">Title:</span> {{title}}</p>
+            <button id="edit-details" class="btn btn-dark">Edit Details</button>
         </div>
         <div class="col-md-12">
-            <p><strong>Description: </strong> {{description}}</p>
+                <label for="title" class="form-label"><strong>Title</strong></label>
+                <input type="text" class="form-control" id="title" name="title" value="{{title}}" disabled>
+        </div>
+        <div class="col-md-12">
+            <label for="description" class="form-label"><strong>Description</strong></label>
+            <textarea class="form-control" id="description" name="description" disabled>{{description}}</textarea>
         </div>
         <div class="col-md-12"> 
-            <p><strong>Creator:</strong> {{creator.firstName}} {{creator.lastName}}</p>
+            <p><strong>Creator</strong></p>
+            <p>{{creator.firstName}} {{creator.lastName}}</p>
         </div>
+        {{#inArray roles user.role}}
+            <div class="col-md-12"></div>
+                <label for="status" class="form-label"><strong>Status</strong></label>
+                <input type="text" class="form-control" id="status" name="status" value="{{status}}" disabled>
+            </div>
+            <div class="col-md-12">
+                <label for="priority" class="form-label"><strong>Priority</strong></label>
+                <input type="text" class="form-control" id="priority" name="priority" value="{{priority}}" disabled>
+            </div>
+            <div class="col-md-12">
+                <label for="estimatedtime" class="form-label"><strong>Estimated Hours</strong></label>
+                <input type="text" class="form-control" id="estimatedtime" name="estimatedtime" value="{{estimatedTime}}" disabled>
+            </div>
+        {{else}}
+                <p><strong>Status</strong></p>
+                <p>{{status}}</p>
+                <p><strong>Priority</strong></p>
+                <p>{{priority}}</p>
+                <p><strong>Estimated Hours</strong></p>
+                <p>{{estimatedTime}}</p>
+        {{/inArray}}
+        {{#eq user.role 'manager'}}
+            <div class="col-md-12">
+                <label for="assignedto" class="form-label"><strong>Assigned To</strong></label>
+                <input type="text" class="form-control" id="assignedto" name="assignedto" value="{{assignedTo.firstName}} {{assignedTo.lastName}}" disabled>
+            </div>
+        {{else}}
+            <p><strong>Assigned To</strong></p>
+            <p>{{assignedTo}}</p>
+        {{/eq}}
         <div class="col-md-12">
-            <p><strong>Status: </strong>{{status}}</p>
-        </div>
-        <div class="col-md-12">
-            <p><strong>Priority: </strong>{{priority}}</p>
-        </div>
-        <div class="col-md-12">
-             <p><strong>Assigned To: </strong>
-                {{assignedTo.firstName}} {{assignedTo.lastName}}
-             </p>
-        </div>
-        <div class="col-md-12">
-            <p><strong>Members:</strong> {{#forEach members}}
-                {{firstName}} {{lastName}} 
-                {{#unless isLast}},{{/unless}}
+            <p><strong>Members:</strong></p> 
+                <ul class="list-group"></ul>
+                {{#forEach members}}
+                    <li class="list-group-item">{{firstName}} {{lastName}}</li>
                 {{/forEach}}
+                </ul>
             </p>
         </div>
-        <div class="col-md-12">
-            <p><strong>Estimated Time: </strong>{{estimatedTime}} hrs</p>
+        <div class="col-md-12"> 
+            <p><strong>Created At</strong></p>
+            <p>{{createdAt}}</p>
+        </div>
+        <div class="col-md-12 card">
+            <div class="card-header"><strong>Comments</strong></div>
+            <div class="card-body">
+                {{#each comments}}
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text">{{content}}</p>
+                            {{#if files}}
+                                <img src="/{{files}}" height="100px" width="100px" alt="comment-image">
+                            {{/if}}
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+        <div class="col-md-12 card">
+            <div class="card-body">
+                    <form id="comment-form" method="post" enctype="multipart/form-data">
+                        <textarea class="form-control my-2" id="addcomment-text" name="content" placeholder="add a comment"></textarea>
+                        <label for="fileupload" class="form-label"><strong>Add File(s)</strong></label>
+                        <input class="form-control" type="file" id="fileupload" name="fileupload" accept="image/png, image/jpeg">
+                        <button id="comment-submit" type="submit" class="btn btn-dark my-2">Send</button>
+                    </form>
+            </div>       
         </div>
         <div class="col-md-12">
-            <p><strong>Created At: </strong>{{createdAt}}</p>
+            <button id="submit-button" class="btn btn-dark form-control" disabled>Submit</button>
         </div>
-        <div class="col-md-12">
-            <p><strong>Comments: </strong>{{comments}}</p>
-        </div>
-
     </div>
 </div>

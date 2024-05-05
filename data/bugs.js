@@ -59,7 +59,6 @@ const createBug = async (bug_obj) =>
     }
     delete bug_obj.role
     const createdBug = await bugsCollection.insertOne(bug_obj)
-    console.log("dsf ",createdBug)
     if (createdBug.insertedId){
         if(role === 'user'){
             let user = await getUser()
@@ -106,7 +105,6 @@ const getAll = async(projectId) => {
 
 export const getAllUserBugs = async(userId,role) => {    
     const bugsCollection = await bugs()
-    console.log(userId,role)
     
     if(!userId) throw "Invalid Project ID"
     validation.checkString(userId,'Project ID')
@@ -133,7 +131,6 @@ export const getAllUserBugs = async(userId,role) => {
             { assignedManager: userId },
             { creator: userId }
           ]}).toArray();
-          console.log("sdad ",allBugs)
         return allBugs;
 
     }

@@ -1,6 +1,4 @@
 import {Router} from 'express';
-import { ObjectId } from 'mongodb';
-import moment from "moment";
 import validation from '../validation.js';
 import { bugData, userData } from '../data/index.js';
 import { getAllUserBugs } from '../data/bugs.js';
@@ -8,7 +6,12 @@ import xss from 'xss';
 import { projectData } from '../data/index.js';
 import { getUsers } from '../data/users.js';
 import { getProject } from '../data/projects.js';
+import fs from 'fs';
+import multer from 'multer'
+import { createComment } from '../data/comments.js';
 
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 const router = Router({mergeParams:true});
 
 router
@@ -177,6 +180,7 @@ router
         get_bug1.members = get_users
 
         get_bug1.creator = get_creator[0]
+        get_bug1.roles = ['manager','tester','developer']
         return res.render('bugdetails',get_bug1)
     }
     catch(e)
@@ -220,6 +224,37 @@ router
 })
 
 router
+.route('/bugs/:bugId/addcomment')
+.post(upload.single('fileupload'),async (req,res) => {
+    if (req.file) {
+        req.body.file = req.file.originalname
+        const fileBuffer = req.file.buffer;
+        const filePath = `public/uploads/${req.session.user.email}/${req.params.bugId}/${req.file.originalname}`;
+        req.body.files = filePath
+
+        fs.mkdirSync(`public/uploads/${req.session.user.email}/${req.params.bugId}/`, {recursive:true});
+        fs.writeFileSync(filePath, fileBuffer);
+      }
+
+    req.body.userId = req.session.user._id
+    await createComment(req.params.bugId,req.body)
+  
+})
+
+router.route('/addmember')
+.get(async(req,res) => {
+    return res.render('addmember');
+})
+.post(async (req,res) =>{
+    try{
+        const email = req.body.email;
+        return res.redirect('/dashboard')
+    } catch(e){
+        res.status(404).render('addmember',{error:true,msg:e})
+    }
+})
+
+router
     .route('/:projectId')
     .get(async(req, res) => {
         let projectId = req.params.projectId.trim()
@@ -237,6 +272,7 @@ router
             return res.status(404).json({error :e})
         }
 })
+
 
 
     

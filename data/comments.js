@@ -3,13 +3,15 @@ import { ObjectId, ReturnDocument, ServerApiVersion } from 'mongodb'
 import moment from "moment"
 import validation from '../validation.js'
 
-const createComment = async (
+export const createComment = async (
     bugId,
    updateObject_comment
     
 ) => {
-    let {userId, timestamp, content,files} = updateObject_comment
-    let create_comment = {bugId:bugId, userId:userId, timestamp:timestamp, content:content, files:files}
+    let {userId,content,files} = updateObject_comment
+    let create_comment = {bugId:bugId, userId: new ObjectId(userId), content:content, files:files}
+    let timestamp = moment().format("ddd MMM DD YYYY HH:mm:ss");
+    create_comment.timestamp = timestamp;
     if(!bugId || !userId || !timestamp || !content || !files) throw "All fields must be Supplied"
     validation.checkComment(create_comment,'Comment Created')
     const bugsCollection = await bugs()
@@ -23,7 +25,7 @@ const createComment = async (
     // const bugId = new ObjectId();
     const bug1 = {
       _id: bugId,
-      timestamp: moment().format("ddd MMM DD YYYY HH:mm:ss"),
+      timestamp: timestamp,
       content: content.trim(),
       userId: userId,
       files: files

@@ -163,5 +163,10 @@ router.route('/logout')
 
 })
 
+router.route('/getcurrentuserrole')
+.get(async(req,res) => {
+    return res.json(req.session.user.role);
+})
+
 export default router;
 

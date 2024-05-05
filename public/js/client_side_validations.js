@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded',function(){
     const reset_password = document.getElementById('reset-password')
     const dashboard = document.getElementById('dashboard');
     const create_bug_form = document.getElementById('createBug-form');
+    const bugDetails = document.getElementById('bug-details-form');
 
     const client_validations = {
   
@@ -400,6 +401,48 @@ document.addEventListener('DOMContentLoaded',function(){
                 //         contentType: 'application/merge-patch+json',                    
                 //      })
                 // })
+            })
+        }
+        
+        if(bugDetails){
+            $('#edit-details').on('click', (ev) =>{
+                $.get('http://localhost:3000/getcurrentuserrole', function(role) {
+                    if(role){
+                        $('.form-control').each(function() {
+                            const id = $(this).attr('id')
+                            if(id === 'title' || id === 'description' || id === 'submit-button') $(this).removeAttr('disabled');
+
+                            if(role === 'developer' || role === 'tester' || role === 'manager'){
+                                if(id === 'status' || id === 'priority' || id === 'estimatedtime') $(this).removeAttr('disabled');
+                            }
+
+                            if(role === 'manager'){
+                                if(id === 'assignedto') $(this).removeAttr('disabled');
+                            }
+
+                        })
+                    }
+                })
+            })
+
+            $('#submit-button').on('click', (ev) => {
+                let req = {};
+
+                $('.form-control').each(function (control){
+                    const id = $(this).attr('id');
+                    if(id !== 'submit-button' && id !== 'addcomment'){
+                        req[id] = $(this).val();
+                    }
+                })
+            })
+
+            $('#comment-form').on('submit', (ev) =>{
+                $('#comment-form').attr('action',window.location.href+'/addcomment')
+                const comment = $('#addcomment-text').val().trim();
+                const files = $('#fileupload').val()
+                if(comment !== ''){
+
+                }
             })
         }
 

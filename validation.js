@@ -130,7 +130,7 @@ const exportedMethods = {
     this.checkDate(timestamp,'TimeStamp'),
     this.checkString(content,'Content'),
     this.checkId(userId,'User Id'),
-    this.checkStringArray(files,'Files')
+    this.checkString(files,'Files')
   },
   checkStatus(inputStatus){
     let valid_status = ['In Progress','To Do','Completed','Tesing','In Review']
@@ -145,8 +145,6 @@ const exportedMethods = {
   
   if (valid_priority.includes(inputPriority)){return true}
   else{throw 'Invalid Priority'}
-  
-  
   }
 };
 

@@ -2,6 +2,9 @@
   <p class="h1 text-center my-3 text-bg-dark form-border">Bugs</p>
     <div class="row justify-content-center">
         <a href="bugs/createbug" id="create-bug" class="btn btn-success btn-lg my-2 col-md-4">Create Bug</a>
+        {{#eq user.role 'manager'}}
+            <a href="addmember" id="add-member" class="btn btn-success btn-lg my-2 mx-2 col-md-4">Add Member</a>
+        {{/eq}}
     </div>
   <div id="filter" class="card column mb-3 text-bg-light">
       <div class="col-md-3">

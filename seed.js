@@ -1,6 +1,7 @@
 import { dbConnection, closeConnection } from "./config/mongoConnection.js";
 import {bugs as bugc,projects as projectsc} from './config/mongoCollections.js'
 import bcrypt from 'bcryptjs';
+import { ObjectId } from "mongodb";
 
 let users,projects,bugs
 // Dummy data for MongoDB collection
@@ -109,8 +110,6 @@ const dummyBugData = (users,projects) => { return [
 
         bugs = await dbcon.collection('bugs').insertMany(await dummyBugData(users.insertedIds,projects.insertedIds));
         console.log(`${bugs.insertedCount} Bugs inserted`)
-
-        await closeConnection();
     } catch (error) {
       console.error("Error inserting documents:", error);
     }
@@ -122,7 +121,7 @@ const dummyBugData = (users,projects) => { return [
       const projectCollection = await projectsc()
       const result = await bugsCollection.createIndex({ title: "text",description:"text" },{ default_language: "english" });
       const projectIndex = await projectCollection.createIndex({ name: "text",description:"text" },{ default_language: "english" });
-
+      await closeConnection();
       
 
     }
@@ -132,7 +131,7 @@ const dummyBugData = (users,projects) => { return [
   }
   
   // Call function to insert dummy data
-  // await insertDummyData();
+  await insertDummyData();
   await createIndex()
 
   console.log("Seed Completed")

@@ -36,13 +36,25 @@
         {{#eq user.role 'manager'}}
         <div class="row justify-content-center my-2">
             <div class="col-md-6">
-                <label for="members" class="form-label">Members</label>
-                <select multiple class="form-select" name="members">
+                <label for="assignedDeveloper" class="form-label">Add Developer</label>
+                <select class="form-select" name="assignedDeveloper">
                     {{#each members}}
-                    <option value="{{email}}">{{firstName}} {{lastName}} | {{email}}</option>
+                        {{#eq role 'developer'}}
+                            <option value="{{email}}">{{firstName}} {{lastName}} | {{email}}</option>
+                        {{/eq}}
                     {{/each}}
                 </select>
             </div>
+            <div class="col-md-6">
+                <label for="assignedTester" class="form-label">Add Tester</label>
+                <select class="form-select" name="assignedTester">
+                    {{#each members}}
+                        {{#eq role 'tester'}}
+                            <option value="{{email}}">{{firstName}} {{lastName}} | {{email}}</option>
+                        {{/eq}}
+                    {{/each}}
+                </select>
+            </div>     
         </div>
         {{/eq}}
         {{/isnt}}

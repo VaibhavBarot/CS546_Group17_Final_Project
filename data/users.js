@@ -105,7 +105,8 @@ export const getUsers = async(members_id) =>{
         const user_details = await usersCollection.findOne({_id:new ObjectId(mem_id)})
         user_details_array.push({firstName:user_details.firstName,
                                 lastName:user_details.lastName,
-                            email:user_details.email}
+                            email:user_details.email,
+                        role:user_details.role}
                             )
    
     }
@@ -150,10 +151,13 @@ export const updatePassword = async(email, oldPassword, newPassword) =>{
         throw "Password not updated"
     }
     return {'passwordUpdated':true}
-
-
-
-
 }
 
-export default{registerUser,loginUser,getUsers, updatePassword, getUser}
+export const getAllUsers = async() =>{
+    const usersCollection = await users()
+
+    let allUsers = await usersCollection.find({}).toArray()
+    return allUsers.filter(user => user.role !== 'manager')
+}
+
+export default{registerUser,loginUser,getUsers, updatePassword, getUser, getAllUsers}
