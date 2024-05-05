@@ -48,7 +48,7 @@ export const getAllProjects = async () =>{
     return allProjects;
 };
 // console.log(await getAllProjects())
-const getProject=async(projectId)=>{
+export const getProject=async(projectId)=>{
     // projectId=projectId.trim();
     if(!projectId || !ObjectId.isValid(projectId)){throw "Id is empty or invalid."}
     validation.checkString(projectId,"projectId");
@@ -118,7 +118,6 @@ const addMember=async(projectId,memberEmail)=>{
     //        throw `This user is already a member of the Project.`;  
     //    }
         if(element.equals(user._id)) throw"Already a member of project"
-        console.log(element)
     })
     project['members'].push(user._id);
     const updatedproject=await projectCollection.findOneAndUpdate({"_id":new ObjectId(projectId)},{$set:project},{returnDocument:'after'});

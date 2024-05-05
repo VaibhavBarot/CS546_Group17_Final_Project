@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded',function(){
     const create_devtest_signup_form = document.getElementById('create-devtest-signup-form')
     const reset_password = document.getElementById('reset-password')
     const dashboard = document.getElementById('dashboard');
+    const create_bug_form = document.getElementById('createBug-form');
 
     const client_validations = {
   
@@ -329,7 +330,6 @@ document.addEventListener('DOMContentLoaded',function(){
         if(dashboard){
             $('.delete-button').each(function() {
                 const projectId = $(this).attr('data-id')
-                console.log($(this))
                 $(this).on('click', (ev) => {
                     $.ajax({
                         method:'DELETE',
@@ -359,11 +359,6 @@ document.addEventListener('DOMContentLoaded',function(){
                 })
             })
         }
-        // if('createBug-form'){
-        //     const bugName = document.getElementById('bug-name').value().trim()
-        //     const bugDescription = document.getElementById('bug-description').value().trim()
-        //     if(bugName.length == 0 || bugDescription.length == 0){}
-        // }
 
         if(reset_password){
             reset_password.addEventListener('submit',function(event){

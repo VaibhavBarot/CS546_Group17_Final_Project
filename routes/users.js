@@ -117,8 +117,7 @@ router.route('/firstLogin')
     return res.render('firstLogin')
 })
 .post(async(req,res)=>{
-    // console.log("Innnnnn")
-    let {email,oldPassword,newPassword} = req.body
+        let {email,oldPassword,newPassword} = req.body
     try{
         if(!oldPassword || !newPassword ){
             return res.status(400).render('firstLogin',{error:true})

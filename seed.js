@@ -127,7 +127,7 @@ const dummyBugData = (users,projects) => { return [
 
     }
     catch (err){
-      console.log("Error Creating index")
+      console.log(err)
     }
   }
   
