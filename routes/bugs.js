@@ -4,11 +4,14 @@ import { bugData, userData } from '../data/index.js';
 import { getAllUserBugs } from '../data/bugs.js';
 import xss from 'xss';
 import { projectData } from '../data/index.js';
-import { getUsers } from '../data/users.js';
+import { getAllUsers, getUsers } from '../data/users.js';
 import { getProject } from '../data/projects.js';
 import fs from 'fs';
 import multer from 'multer'
 import { createComment } from '../data/comments.js';
+import exportedHelpers from "../helpers.js";
+import { addMember } from '../data/projects.js';
+
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -18,6 +21,12 @@ router
 .route('/bugs')
 .get(async (req,res) => {
     const bugs = await getAllUserBugs(req.session.user._id,req.session.user.role);
+    bugs.forEach(bug => {
+        bug.priority = exportedHelpers.getPriority(bug.priority)
+        bug.status = exportedHelpers.getStatus(bug.status)
+    });
+    
+    
     return res.render('bugPage',{role:req.session.user.role,bugs:bugs})
 })
 .post(async(req, res) =>{
@@ -81,8 +90,13 @@ router
 .route('/bugs/createbug')
 .get(async (req,res) => {
     const project = await projectData.getProject(req.params.projectId);
-    project.members = await getUsers(project.members);
-    return res.render('createbug', {members:project.members});
+    let members_array = []
+    for await (let members of project.members){
+        let member = await getUsers(members)
+        members_array.push(member)
+    }
+
+    return res.render('createbug', {members:members_array});
 })
 .post(async (req,res) => {
     const {title, description} = req.body
@@ -97,15 +111,6 @@ router
         var {priority,status,assignedDeveloper} = req.body
         let project = await getProject(projectId)
             var assignedManager = project.manager
-        // var bug_obj ={
-        //     title:title,
-        //     description:description,
-        //     priority:priority,
-        //     status:status,
-        //     assignedDeveloper:assignedDeveloper,
-        //     role:req.session.user.role,
-        //     creator: req.session.user._id
-        // }
         
     }
    
@@ -171,15 +176,17 @@ router
         validation.checkString(bugId,'BugId')
         validation.checkId(bugId, 'BugId')
         const get_bug1 = await bugData.getBug(bugId)
-        const get_users = await userData.getUsers(get_bug1.members)
-        if(get_bug1.assignedTo){
-            const get_assigned_user = await userData.getUsers([get_bug1.assignedTo])
-            get_bug1.assignedTo = get_assigned_user[0]
-        }
-        const get_creator = await userData.getUsers([get_bug1.creator])
-        get_bug1.members = get_users
+        const members = []
+        if(get_bug1.assignedManager) get_bug1.assignedManager = await getUsers(get_bug1.assignedManager)
+        if(get_bug1.assignedDeveloper) (get_bug1.assignedDeveloper) =  await getUsers(get_bug1.assignedDeveloper)
+        if(get_bug1.assignedTester) (get_bug1.assignedTester) =  await getUsers(get_bug1.assignedTester)
+        if(get_bug1.creator) (get_bug1.creator) =  await  getUsers(get_bug1.creator)
 
-        get_bug1.creator = get_creator[0]
+        for await (let comment of get_bug1.comments){
+            comment.userId = await getUsers(comment.userId)
+        }
+
+
         get_bug1.roles = ['manager','tester','developer']
         return res.render('bugdetails',get_bug1)
     }
@@ -189,15 +196,11 @@ router
     }
 })
 
-.patch(async(req, res) => {
+.post(async(req, res) => {
     let bugId = req.params.bugId.trim()
     let updateObject = req.body
     let {title, description,creator,status,priority,assignedTo,members,projectId,estimatedTime,createdAt} = req.body
     try{
-//         if(!title || !description || !creator || !status || !priority || !assignedTo || !members || !projectId || !estimatedTime || !createdAt)
-//    {
-//        throw "All fields must be supplied"
-//    }   
    validation.checkBug(updateObject, 'Updated Bug')
    const update_bug = await bugData.updateBug(bugId, updateObject)
    return res.json(update_bug)
@@ -238,16 +241,20 @@ router
 
     req.body.userId = req.session.user._id
     await createComment(req.params.bugId,req.body)
+
+    res.redirect('../' + req.params.bugId)
   
 })
 
 router.route('/addmember')
 .get(async(req,res) => {
-    return res.render('addmember');
+    const users = await getAllUsers();
+    return res.render('addmember', {members:users});
 })
 .post(async (req,res) =>{
     try{
         const email = req.body.email;
+        await addMember(req.params.projectId, email)
         return res.redirect('/dashboard')
     } catch(e){
         res.status(404).render('addmember',{error:true,msg:e})

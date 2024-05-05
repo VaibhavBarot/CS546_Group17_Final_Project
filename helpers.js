@@ -4,6 +4,21 @@ import nodemailer from 'nodemailer';
 import 'dotenv/config';
 let email = process.env.EMAIL
 let pass = process.env.PASSWORD
+
+const status_map = {
+  'todo':'To Do',
+  'inreview' : 'In Review',
+   'intesting' : 'In Testing',
+   'completed' : 'Completed',
+   'inprogress' : 'In Progress'
+}
+
+const priority_map={
+  'high' : 'High',
+  'medium' : 'Medium',
+  'low' : 'Low'
+}
+
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -47,7 +62,14 @@ const exportedHelpers = {
             } else {
               console.log('Email sent: ' + info.response);
             }});
-}}
+},
+  getPriority:(priority) =>{
+    return priority_map[priority]
+  },
+  getStatus:(status) =>{
+    return status_map[status]
+  },
+}
 //exportedHelpers.sendEmail('rahuldoshi34@gmail.com','Test','123')
 
 export default exportedHelpers;

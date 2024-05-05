@@ -4,12 +4,12 @@
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <label for="name" class="form-label">Title</label>
-                <input type="text" class="form-control" id="bug-name" name="name">
+                <input type="text" class="form-control" id="bug-name" name="title">
             </div>
     </div>
         <div class="col-md-12">
             <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="bug-description" name="bug-description" rows="3"></textarea>
+            <textarea class="form-control" id="bug-description" name="description" rows="3"></textarea>
         </div>
 
         {{#isnt user.role 'user'}}

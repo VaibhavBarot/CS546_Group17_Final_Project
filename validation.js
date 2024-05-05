@@ -129,8 +129,8 @@ const exportedMethods = {
     this.checkId(bugId, 'Bug Id'),
     this.checkDate(timestamp,'TimeStamp'),
     this.checkString(content,'Content'),
-    this.checkId(userId,'User Id'),
-    this.checkString(files,'Files')
+    this.checkId(userId.toString(),'User Id')
+    if(files) this.checkString(files,'Files')
   },
   checkStatus(inputStatus){
     let valid_status = ['In Progress','To Do','Completed','Tesing','In Review']

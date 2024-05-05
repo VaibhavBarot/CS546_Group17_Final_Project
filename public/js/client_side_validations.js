@@ -425,16 +425,16 @@ document.addEventListener('DOMContentLoaded',function(){
                 })
             })
 
-            $('#submit-button').on('click', (ev) => {
-                let req = {};
+            // $('#submit-button').on('click', (ev) => {
+            //     let req = {};
 
-                $('.form-control').each(function (control){
-                    const id = $(this).attr('id');
-                    if(id !== 'submit-button' && id !== 'addcomment'){
-                        req[id] = $(this).val();
-                    }
-                })
-            })
+            //     $('.form-control').each(function (control){
+            //         const id = $(this).attr('id');
+            //         if(id !== 'submit-button' && id !== 'addcomment'){
+            //             req[id] = $(this).val();
+            //         }
+            //     })
+            // })
 
             $('#comment-form').on('submit', (ev) =>{
                 $('#comment-form').attr('action',window.location.href+'/addcomment')

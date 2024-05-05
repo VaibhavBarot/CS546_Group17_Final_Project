@@ -96,21 +96,15 @@ else{
 }
 }
 
-export const getUsers = async(members_id) =>{
+export const getUsers = async (members_id) => {
     const usersCollection = await users()
-
-    const user_details_array = []
-    for(let i = 0; i < members_id.length ; i++){
-        const mem_id = members_id[i]
-        const user_details = await usersCollection.findOne({_id:new ObjectId(mem_id)})
-        user_details_array.push({firstName:user_details.firstName,
-                                lastName:user_details.lastName,
-                            email:user_details.email,
-                        role:user_details.role}
-                            )
-   
+    const user_details = await usersCollection.findOne({ _id: new ObjectId(members_id) })
+    return {
+        firstName: user_details.firstName,
+        lastName: user_details.lastName,
+        email: user_details.email,
+        role: user_details.role
     }
-    return user_details_array
 
 }
 
@@ -157,7 +151,7 @@ export const getAllUsers = async() =>{
     const usersCollection = await users()
 
     let allUsers = await usersCollection.find({}).toArray()
-    return allUsers.filter(user => user.role !== 'manager')
+    return allUsers.filter(user => user.role !== 'manager' && user.role !== 'user')
 }
 
 export default{registerUser,loginUser,getUsers, updatePassword, getUser, getAllUsers}

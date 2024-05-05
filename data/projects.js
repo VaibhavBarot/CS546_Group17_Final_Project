@@ -105,7 +105,7 @@ const  deleteProject=async (projectId)=>{
     if(!deletingProject) throw "Project deletion  Failed.";
     return true;
 }
-const addMember=async(projectId,memberEmail)=>{
+export const addMember=async(projectId,memberEmail)=>{
     if(!projectId||!memberEmail||!ObjectId.isValid(projectId)) throw "Invalid input provided"
     const projectCollection=await projects();
     const usersCollection=await users();

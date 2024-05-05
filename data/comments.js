@@ -12,10 +12,9 @@ export const createComment = async (
     let create_comment = {bugId:bugId, userId: new ObjectId(userId), content:content, files:files}
     let timestamp = moment().format("ddd MMM DD YYYY HH:mm:ss");
     create_comment.timestamp = timestamp;
-    if(!bugId || !userId || !timestamp || !content || !files) throw "All fields must be Supplied"
+    if(!bugId || !userId || !timestamp || !content) throw "All fields must be Supplied"
     validation.checkComment(create_comment,'Comment Created')
     const bugsCollection = await bugs()
-    // const files = []
     const bug_comment = await bugsCollection.findOne({_id: new ObjectId(bugId)});
     if(!bug_comment)
     {

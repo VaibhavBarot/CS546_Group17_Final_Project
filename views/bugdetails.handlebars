@@ -4,7 +4,8 @@
         <div class="col-md-12">
             <button id="edit-details" class="btn btn-dark">Edit Details</button>
         </div>
-        <div class="col-md-12">
+        <form method="post" action="bugdetails">
+            <div class="col-md-12">
                 <label for="title" class="form-label"><strong>Title</strong></label>
                 <input type="text" class="form-control" id="title" name="title" value="{{title}}" disabled>
         </div>
@@ -17,14 +18,24 @@
             <p>{{creator.firstName}} {{creator.lastName}}</p>
         </div>
         {{#inArray roles user.role}}
-            <div class="col-md-12"></div>
-                <label for="status" class="form-label"><strong>Status</strong></label>
-                <input type="text" class="form-control" id="status" name="status" value="{{status}}" disabled>
-            </div>
             <div class="col-md-12">
-                <label for="priority" class="form-label"><strong>Priority</strong></label>
-                <input type="text" class="form-control" id="priority" name="priority" value="{{priority}}" disabled>
-            </div>
+            <label for="status" class="form-label">Status</label>
+            <select id="status"class="form-select form-control" name="status" disabled>
+                <option value="todo" selected>To Do</option>
+                <option value="inprogress">In Review</option>
+                <option value="inprogress">In Progress</option>
+                <option value="inprogress">In Testing</option>
+                <option value="inprogress">Completed</option>
+            </select>
+        </div>
+            <div class="col-md-12">
+            <label for="priority" class="form-label">Priority</label>
+            <select id="priority" class="form-select form-control" name="priority" disabled>
+                <option value="high" selected>High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
+    </div>
             <div class="col-md-12">
                 <label for="estimatedtime" class="form-label"><strong>Estimated Hours</strong></label>
                 <input type="text" class="form-control" id="estimatedtime" name="estimatedtime" value="{{estimatedTime}}" disabled>
@@ -39,31 +50,34 @@
         {{/inArray}}
         {{#eq user.role 'manager'}}
             <div class="col-md-12">
-                <label for="assignedto" class="form-label"><strong>Assigned To</strong></label>
-                <input type="text" class="form-control" id="assignedto" name="assignedto" value="{{assignedTo.firstName}} {{assignedTo.lastName}}" disabled>
+                <label for="assignedto" class="form-label"><strong>Assigned Developer</strong></label>
+                <input type="text" class="form-control" id="assigneddeveloper" name="assigneddeveloper" value="{{assignedDeveloper.firstName}} {{assignedDeveloper.lastName}}" disabled>
+            </div>
+            <div class="col-md-12">
+                <label for="assignedto" class="form-label"><strong>Assigned Tester</strong></label>
+                <input type="text" class="form-control" id="assignedtester" name="assignedtester" value="{{assignedTo.firstName}} {{assignedDeveloper.lastName}}" disabled>
             </div>
         {{else}}
-            <p><strong>Assigned To</strong></p>
-            <p>{{assignedTo}}</p>
+            <p><strong>Assigned Developer</strong></p>
+            <p>{{assignedDeveloper.firstName}} {{assignedDeveloper.lastName}}</p>
+
+            <p><strong>Assigned Tester</strong></p>
+            <p>{{assignedTester.firstName}} {{assignedTester.lastName}}</p>
         {{/eq}}
-        <div class="col-md-12">
-            <p><strong>Members:</strong></p> 
-                <ul class="list-group"></ul>
-                {{#forEach members}}
-                    <li class="list-group-item">{{firstName}} {{lastName}}</li>
-                {{/forEach}}
-                </ul>
-            </p>
-        </div>
         <div class="col-md-12"> 
             <p><strong>Created At</strong></p>
             <p>{{createdAt}}</p>
         </div>
+                <div class="col-md-12">
+            <button id="submit-button" class="btn btn-dark form-control" type=="submit" disabled>Submit</button>
+        </div>
+        </form>
         <div class="col-md-12 card">
             <div class="card-header"><strong>Comments</strong></div>
             <div class="card-body">
                 {{#each comments}}
                     <div class="card">
+                        <div class="card-header">{{userId.firstName}} {{userId.lastName}}</div>
                         <div class="card-body">
                             <p class="card-text">{{content}}</p>
                             {{#if files}}
@@ -83,9 +97,6 @@
                         <button id="comment-submit" type="submit" class="btn btn-dark my-2">Send</button>
                     </form>
             </div>       
-        </div>
-        <div class="col-md-12">
-            <button id="submit-button" class="btn btn-dark form-control" disabled>Submit</button>
         </div>
     </div>
 </div>
