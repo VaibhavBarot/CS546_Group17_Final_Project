@@ -3,12 +3,17 @@ const router = Router();
 import{commentsData} from '../data/index.js';
 import { ObjectId } from "mongodb";
 import moment from 'moment';
-import validation from '../validation.js'
+import validation from '../validation.js';
+import xss from 'xss';
 router
 .route('/:bugId')
 .post(async(req,res)=> {
     let bugId = req.params.bugId.trim()
-    let {timestamp, content, userId, files} = req.body
+    let timestamp=xss(req.body.timestamp);
+    let content=xss(req.body.content);
+    let userId=xss(req.body.userId);
+    let files=xss(req.body.files);
+    // let {timestamp, content, userId, files} = req.body
     try{
         
         let create_comment1 = {bugId:bugId, userId:userId, timestamp:timestamp, content:content, files:files}

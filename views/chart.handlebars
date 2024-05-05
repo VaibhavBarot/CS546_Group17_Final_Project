@@ -1,0 +1,135 @@
+{{!-- <header>
+    <h1>Bugs Summary Page</h1>
+</header> --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<style>
+    /*header{
+        text-align: center;
+    }*/
+    .chart-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    .chart-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    table {
+        width: 50%;
+        text-align: left;
+        margin-top: 20px;
+    }
+    /*footer{
+        font-weight: bold;
+        text-align: center;
+        margin-top: 10%;
+    }*/
+</style>
+<div class="chart-container">
+    <div class="chart-box">
+        <canvas id="BugStatus" style="width:100%;max-width:600px"></canvas>
+        <table id="statusTable" border="1">
+            <tr>
+                <th>Status</th>
+                <th>Count</th>
+            </tr>
+        </table>
+    </div>
+    <div class="chart-box">
+        <canvas id="Priority" style="width:100%;max-width:600px"></canvas>
+        <table id="PriorityTable" border="1">
+            <tr>
+                <th>Priority</th>
+                <th>Count</th>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script>
+let result = {
+    total_bugs: 0,
+    status: {
+        'To Do': 5,
+        'In Progress': 10,
+        'Completed': 8,
+        'In Review': 2,
+        'Testing': 7
+    },
+    priority: {
+        'High': 10,
+        'Medium': 7,
+        'Low': 1
+    }
+};
+
+// Status Pie Chart and Table
+let statusKeys = Object.keys(result.status);
+let statusValues = Object.values(result.status);
+let pieColors = ["#b91d47", "#00aba9", "#2b5797", "#e8c3b9", "#1e7145"];
+let statusTable = document.getElementById("statusTable");
+
+for (let i = 0; i < statusKeys.length; i++) {
+    let row = statusTable.insertRow();
+    let cell1 = row.insertCell(0);
+    let cell2 = row.insertCell(1);
+    cell1.innerHTML = statusKeys[i];
+    cell2.innerHTML = statusValues[i];
+}
+
+new Chart("BugStatus", {
+    type: "pie",
+    data: {
+        labels: statusKeys,
+        datasets: [{
+            backgroundColor: pieColors,
+            data: statusValues
+        }]
+    },
+    options: {
+        title: {
+            display: true,
+            text: "Bug Status Distribution"
+        }
+    }
+});
+
+// Priority Bar Chart and Table
+let priorityKeys = Object.keys(result.priority);
+let priorityValues = Object.values(result.priority);
+priorityValues.push(0); // Append zero to the end of priority values array
+let barColors = ["red", "orange", "green"];
+let priorityTable = document.getElementById("PriorityTable");
+
+for (let i = 0; i < priorityKeys.length; i++) {
+    let row = priorityTable.insertRow();
+    let cell1 = row.insertCell(0);
+    let cell2 = row.insertCell(1);
+    cell1.innerHTML = priorityKeys[i];
+    cell2.innerHTML = priorityValues[i];
+}
+
+new Chart("Priority", {
+    type: "bar",
+    data: {
+        labels: priorityKeys,
+        datasets: [{
+            backgroundColor: barColors,
+            data: priorityValues
+        }]
+    },
+    options: {
+        legend: { display: false },
+        title: {
+            display: true,
+            text: "Bug Priority Distribution"
+        }
+    }
+});
+</script>
