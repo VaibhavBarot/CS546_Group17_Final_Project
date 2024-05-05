@@ -29,30 +29,25 @@ const createProjects=async(
             throw "One or more member ids are invalid.";
         }
     });
-    const proj=await projects();
-    const projs=await proj.find({}).toArray();
+    const projectCollection = await projects()
+    const projs=await projectCollection.find({}).toArray();
     // console.log(users);
     projs.forEach(element => {if(element.name.toLowerCase()===project.name.toLowerCase()) throw `A project with the name ${project.name} already exists.`
     });
-    // const existingProject= await proj.findOne({name:projectName});
-    // if(existingProject){
-    //     throw `A project with the name ${projectName} already exists.`
-    // }
-    const result=await proj.insertOne(project);
+    const result=await projectCollection.insertOne(project);
     if(!result || !result.acknowledged) throw "Project insertion failed!";
     return result;
 };
 
-const getAllProjects = async () =>{
-    const projectCollection= await projects();
+export const getAllProjects = async () =>{
+    const projectCollection= await projects()
     let allProjects=await projectCollection.find({}).toArray();
     if(!allProjects){throw "Failed to fetch Projects"};
     // convert ObjectId  to string
     allProjects=allProjects.map((proj)=> {proj._id=proj._id.toString();return proj;});
-    //Will only show project name and its description
-    // return allProjects.map((project)=>({name:project.name,description:project.description}));
     return allProjects;
 };
+// console.log(await getAllProjects())
 const getProject=async(projectId)=>{
     // projectId=projectId.trim();
     if(!projectId || !ObjectId.isValid(projectId)){throw "Id is empty or invalid."}
@@ -63,6 +58,16 @@ const getProject=async(projectId)=>{
     // requestedProject._id=requestedProject._id.toString();
     return requestedProject;
 };
+export const getAllUserProjects = async(userId) => { 
+    const projectsCollection=await projects();   
+    
+    if(!userId) throw "Invalid User ID"
+    validation.checkString(userId,'User ID')
+    validation.checkId(userId,'User ID')
+     const proj = await projectsCollection.find({members:new ObjectId(userId)}).toArray();
+     return proj; 
+ 
+ };
 const updateProject=async(projectId,updateProductObject)=>{
     const projectCollection = await projects();
     const project=await  getProject(projectId);
@@ -86,7 +91,7 @@ const updateProject=async(projectId,updateProductObject)=>{
         project.creator=project.creator;
         project.members=project.members;
     }
-    const updatedproject=await projectCollection.findOneAndUpdate({"_id":new ObjectId(projectId)},{$set:project},{returnDocument:'after'});
+    const updatedproject=await projectCollection.collection('projects').findOneAndUpdate({"_id":new ObjectId(projectId)},{$set:project},{returnDocument:'after'});
     // console.log(updatedproject);
     if(!updatedproject) throw "Update Failed";
     const fetchupdatedproject= await  projectCollection.findOne({_id: new ObjectId(projectId)});
@@ -95,20 +100,11 @@ const updateProject=async(projectId,updateProductObject)=>{
 const  deleteProject=async (projectId)=>{
     if (!projectId||!ObjectId.isValid(projectId)) throw 'Invalid project ID';
     validation.checkString(projectId,'projectID');
-    const projectsCollection=await projects();
+    const projectsCollection=await projects()
     const deletingProject=await projectsCollection.findOneAndDelete({_id:new ObjectId(projectId)});
     if(!deletingProject) throw "Project deletion  Failed.";
     return true;
 }
-export const getAllUserProjects = async(userId) => {    
-    const dbcon = await dbConnection();
-    if(!userId) throw "Invalid User ID"
-    validation.checkString(userId,'User ID')
-    validation.checkId(userId,'User ID')
-     const projects = await dbcon.collection('projects').find({members:new ObjectId(userId)}).toArray();
-     return projects; 
- 
- };
 const addMember=async(projectId,memberEmail)=>{
     if(!projectId||!memberEmail||!ObjectId.isValid(projectId)) throw "Invalid input provided"
     const projectCollection=await projects();
@@ -133,6 +129,19 @@ const addMember=async(projectId,memberEmail)=>{
     // console.log(project["members"])
     // return project;
 };
+export const searchProjects =async(searchInput)=>{
+    searchInput =searchInput.trim()
+    const projectsCollection = await projects() 
+    if (searchInput.length == 0){
+        const searchResult = await projectsCollection.find({}).toArray()
+        return searchResult
+    }
+    const query = {$text:{$search:`\"${searchInput}\"`}}
+    const searchResult = await projectsCollection.find(query).toArray()
+    return searchResult
+
+
+}
 // const deleteMember=async(projectId,memberEmail)=>{
 //     if(!projectId||!memberId||!ObjectId.isValid(projectId)||!ObjectId.isValid(memberId)) throw "Invalid Id provided"
 //     const projectCollection=await projects();
@@ -151,4 +160,4 @@ const addMember=async(projectId,memberEmail)=>{
 //     // console.log(project["members"])
 //     // return project;
 // };
-export default {createProjects,getAllProjects,getProject,deleteProject,updateProject,addMember};
+export default {createProjects,getAllProjects,getProject,deleteProject,updateProject,addMember,searchProjects};

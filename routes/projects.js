@@ -2,7 +2,8 @@ import {Router} from 'express';
 import {projectData} from "../data/index.js";
 import validation from '../validation.js';
 import { ObjectId } from 'mongodb';
-const router = Router();
+import { searchProjects } from '../data/projects.js';
+const router = Router({ mergeParams: true });
 
 router
 .route('/')
@@ -72,6 +73,7 @@ router
       return res.status(200).json(ans);
     }catch(e){return res.status(404).json({error: e.toString()});};
     })
+    
 router
 .route('/addMember')
 .post(async(req,res)=>{
@@ -83,6 +85,18 @@ router
         return res.status(200).json(data);
     }catch(e){
         return res.status(400).json({error: e.toString()});
+    }
+})
+
+router
+.route('/searchprojects')
+.post(async (req,res) => {
+    try{
+        const {searchText} = req.body;
+        const projects = await searchProjects(searchText);
+        return res.json(projects);
+    } catch(e){
+        res.status(400).json({e:'Error in search'})
     }
 })
 // .delete(async(req,res)=>{

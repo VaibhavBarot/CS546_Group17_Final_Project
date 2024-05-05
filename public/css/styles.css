@@ -32,3 +32,55 @@ footer{
         text-align: center;
         margin-top: 14%;
     }
+.btn-logout{
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 9999;
+}
+
+#reg_new_user{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
+    color: blue;
+    text-align: center;
+}
+
+#reg_new_user a{
+    text-decoration: none;
+    color: teal;
+}
+
+#reg_new_user a:hover{
+    text-decoration: underline;
+}
+
+#go_to_login{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
+    color: blue;
+    text-align: center;
+}
+
+#go_to_login a{
+    text-decoration: none;
+    color: teal;
+}
+
+#go_to_login a:hover{
+    text-decoration: underline;
+}
+
+header {
+    background-color: rgb(34, 34, 97);
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  header h1 {
+    margin: 0;
+    font-size: 30px;
+
+  }
+

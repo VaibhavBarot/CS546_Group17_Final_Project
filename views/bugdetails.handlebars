@@ -1,0 +1,42 @@
+<div class="container">
+    <p class="h1 text-center my-2 text-primary form-border">Bug Details</p>
+    <div class="row">
+        <div class="col-md-12">
+            <p class="h3"><span class="font-weight-bold">Title:</span> {{title}}</p>
+        </div>
+        <div class="col-md-12">
+            <p><strong>Description: </strong> {{description}}</p>
+        </div>
+        <div class="col-md-12"> 
+            <p><strong>Creator:</strong> {{creator.firstName}} {{creator.lastName}}</p>
+        </div>
+        <div class="col-md-12">
+            <p><strong>Status: </strong>{{status}}</p>
+        </div>
+        <div class="col-md-12">
+            <p><strong>Priority: </strong>{{priority}}</p>
+        </div>
+        <div class="col-md-12">
+             <p><strong>Assigned To: </strong>
+                {{assignedTo.firstName}} {{assignedTo.lastName}}
+             </p>
+        </div>
+        <div class="col-md-12">
+            <p><strong>Members:</strong> {{#forEach members}}
+                {{firstName}} {{lastName}} 
+                {{#unless isLast}},{{/unless}}
+                {{/forEach}}
+            </p>
+        </div>
+        <div class="col-md-12">
+            <p><strong>Estimated Time: </strong>{{estimatedTime}} hrs</p>
+        </div>
+        <div class="col-md-12">
+            <p><strong>Created At: </strong>{{createdAt}}</p>
+        </div>
+        <div class="col-md-12">
+            <p><strong>Comments: </strong>{{comments}}</p>
+        </div>
+
+    </div>
+</div>

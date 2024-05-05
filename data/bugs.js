@@ -1,4 +1,4 @@
-import { dbConnection, closeConnection } from "../config/mongoConnection.js";
+import { bugs } from "../config/mongoCollections.js";
 import { ObjectId } from 'mongodb';
 import moment from 'moment';
 import validation from '../validation.js';
@@ -26,11 +26,11 @@ const createBug = async (
     validation.checkBug(create_object,'Bug Created')  
 
     
-    const dbcon = await dbConnection()
+    const bugsCollection = await bugs()
     const comments = []
 
     
-    const create_bug = await dbcon.collection('bugs').insertOne({
+    const create_bug = await bugsCollection.insertOne({
         title,
     description,
     creator,
@@ -51,12 +51,12 @@ const createBug = async (
 }
 
 const getAll = async(projectId) => {    
-   const dbcon = await dbConnection();
+    const bugsCollection = await bugs()
    if(!projectId) throw "Invalid Project ID"
    validation.checkString(projectId,'Project ID')
-   projectId = validation.checkId(projectId,'Project ID')
+   validation.checkId(projectId,'Project ID')
    projectId = new ObjectId(projectId)
-    const bugs = await dbcon.collection('bugs').find({projectId:projectId}).toArray()
+    const bugs = await bugsCollection.find({projectId:projectId}).toArray()
     return bugs;
     // const bugs = await dbcon.collection('')
 
@@ -64,21 +64,21 @@ const getAll = async(projectId) => {
 }
 
 export const getAllUserBugs = async(userId) => {    
-    const dbcon = await dbConnection();
+    const bugsCollection = await bugs()
     if(!userId) throw "Invalid Project ID"
     validation.checkString(userId,'Project ID')
     validation.checkId(userId,'Project ID')
-     const bugs = await dbcon.collection('bugs').find({members:new ObjectId(userId)}).toArray();
-     return bugs; 
+     const allBugs = await bugsCollection.find({members:new ObjectId(userId)}).toArray();
+     return allBugs; 
  
  }
 
 const getBug = async(bugId) => {   
-    const dbcon = await dbConnection();
+    const bugsCollection = await bugs()
     if(!bugId) throw "Invalid bug Id"
     validation.checkString(bugId,'BugId')
     validation.checkId(bugId, 'BugId')
-    const get_bug = await dbcon.collection('bugs').findOne({_id : new ObjectId(bugId)})
+    const get_bug = await bugsCollection.findOne({_id : new ObjectId(bugId)})
     return get_bug
 
 }
@@ -95,8 +95,8 @@ const updateBug = async(
        throw "All fields must be supplied"
    }
    validation.checkBug(updateObject, 'Updated Object')
-   const dbcon = await dbConnection();
-   const result = await dbcon.collection('bugs').updateOne({_id: new ObjectId(bugId)},
+   const bugsCollection = await bugs()
+   const result = await bugsCollection.updateOne({_id: new ObjectId(bugId)},
    {
     $set:{
         title,
@@ -116,7 +116,7 @@ const updateBug = async(
    {
     throw "Bug Not found"
    }
-   const updated_bug = await dbcon.collection('bugs').findOne({_id: new ObjectId(bugId)})
+   const updated_bug = await bugsCollection.findOne({_id: new ObjectId(bugId)})
    return updated_bug;
 }
 
@@ -124,9 +124,9 @@ const updateBug = async(
 const deleteBug = async(bugId) =>{
     //error handling
     validation.checkId(bugId,'BugId')
-    const dbcon = await dbConnection()
-    const delete_bug = await getBug(bugId, dbcon)
-    const delete_bug1 = await dbcon.collection('bugs').deleteOne({_id:new ObjectId(bugId)});
+    const bugsCollection = await bugs()
+    const delete_bug = await getBug(bugId)
+    const delete_bug1 = await bugsCollection.deleteOne({_id:new ObjectId(bugId)});
     if(delete_bug1.deletedCount === 0)
     {
         throw "Bug not deleted"
@@ -243,7 +243,7 @@ const bugsSummary = async (projectId) =>{
 
 }
 
-console.log(await bugsSummary('6633d3dc2380ed6a4e0a963d'))
+// console.log(await bugsSummary('6633d3dc2380ed6a4e0a963d'))
 // console.log(await filterBugs({'filterStatus':['To Do'],'filterPriority':['High'],'sortBugs':'L2H'},'6633d3dc2380ed6a4e0a963e'))
 // console.log(await search('search'))
 export default {createBug, getAll, getBug, updateBug, deleteBug, getAllUserBugs,filterBugs,search}

@@ -1,13 +1,17 @@
 import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 import moment from "moment";
-const router = Router();
 import validation from '../validation.js';
-import { bugData } from '../data/index.js';
+import { bugData, userData } from '../data/index.js';
 import { getAllUserBugs } from '../data/bugs.js';
 import xss from 'xss';
+import { projectData } from '../data/index.js';
+import { getUsers } from '../data/users.js';
+
+const router = Router({mergeParams:true});
+
 router
-.route('/')
+.route('/bugs')
 .get(async (req,res) => {
     const bugs = await getAllUserBugs(req.session.user._id);
     return res.render('bugPage',{role:req.session.user.role,bugs:bugs})
@@ -70,7 +74,19 @@ router
 )
 
 router
-.route('/:bugId')
+.route('/bugs/createbug')
+.get(async (req,res) => {
+    const project = await projectData.getProject(req.params.projectId);
+    project.members = await getUsers(project.members);
+    return res.render('createbug', {members:project.members});
+})
+.post(async (req,res) => {
+    const {title, description, status, priority, members} = req.body;
+    //await bugData.createBug()
+})
+
+router
+.route('/bugs/:bugId')
 .get(async(req,res) => {
     let bugId = req.params.bugId.trim()
     try{
@@ -78,7 +94,16 @@ router
         validation.checkString(bugId,'BugId')
         validation.checkId(bugId, 'BugId')
         const get_bug1 = await bugData.getBug(bugId)
-        return res.json(get_bug1)
+        const get_users = await userData.getUsers(get_bug1.members)
+        if(get_bug1.assignedTo){
+            const get_assigned_user = await userData.getUsers([get_bug1.assignedTo])
+            get_bug1.assignedTo = get_assigned_user[0]
+        }
+        const get_creator = await userData.getUsers([get_bug1.creator])
+        get_bug1.members = get_users
+
+        get_bug1.creator = get_creator[0]
+        return res.render('bugdetails',get_bug1)
     }
     catch(e)
     {
