@@ -48,6 +48,6 @@ const exportedHelpers = {
               console.log('Email sent: ' + info.response);
             }});
 }}
-exportedHelpers.sendEmail('rahuldoshi34@gmail.com','Test','123')
+// exportedHelpers.sendEmail('rahuldoshi34@gmail.com','Test','123')
 
 export default exportedHelpers;

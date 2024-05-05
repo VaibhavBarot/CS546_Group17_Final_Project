@@ -6,31 +6,35 @@ import { bugData, userData } from '../data/index.js';
 import { getAllUserBugs } from '../data/bugs.js';
 import { projectData } from '../data/index.js';
 import { getUsers } from '../data/users.js';
+import { getProject } from '../data/projects.js';
 
 const router = Router({mergeParams:true});
 
 router
 .route('/bugs')
 .get(async (req,res) => {
-    const bugs = await getAllUserBugs(req.session.user._id);
+    const bugs = await getAllUserBugs(req.session.user._id,req.session.user.role);
     return res.render('bugPage',{role:req.session.user.role,bugs:bugs})
 })
 .post(async(req, res) =>{
+    console.log("Innnn")
     let{
     title,
     description,
-    creator,
     status,
     priority,
     assignedTo,
     members,
     projectId,
-    estimatedTime,
-    createdAt,
+    
+
     } = req.body
 
+    let creator = new ObjectId(user.session.user._id)
+    let createdAt = new Date()
+
     try{
-        if(!title || !description || !creator || !status || !priority || !assignedTo || !members || !projectId || !estimatedTime || !createdAt)
+        if(!title || !description || !creator || !status || !priority || !assignedTo || !members || !projectId || !createdAt)
     {
         throw "All fields must be supplied"
     }
@@ -71,8 +75,83 @@ router
     return res.render('createbug', {members:project.members});
 })
 .post(async (req,res) => {
-    const {title, description, status, priority, members} = req.body;
-    //await bugData.createBug()
+    console.log(req.body)
+    const {title, description} = req.body
+    const projectId = req.params.projectId
+    if (req.session.user){
+        if(req.session.user.role === 'user'){
+            let project = await getProject(projectId)
+            var assignedManager = project.manager
+
+        }
+    else if(req.session.user.role === 'tester'){
+        var {priority,status,assignedDeveloper} = req.body
+        let project = await getProject(projectId)
+            var assignedManager = project.manager
+        // var bug_obj ={
+        //     title:title,
+        //     description:description,
+        //     priority:priority,
+        //     status:status,
+        //     assignedDeveloper:assignedDeveloper,
+        //     role:req.session.user.role,
+        //     creator: req.session.user._id
+        // }
+        
+    }
+   
+    else if(req.session.user.role === 'manager'){
+        var {priority,status,assignedDeveloper,assignedTester} = req.body
+        var assignedManager = req.session.user._id
+        
+    }
+    let bug_obj ={
+        title:title,
+        description:description,
+        priority:priority || 'Not Assigned',
+        status:status || 'Not Assigned',
+        assignedDeveloper:assignedDeveloper || 'Not Assigned',
+        assignedTester:assignedTester || 'Not Assigned',
+        assignedManager:assignedManager,
+        role:req.session.user.role,
+        creator: req.session.user._id
+        
+    }
+    const bug= await bugData.createBug(bug_obj)
+    console.log("bug data ",bug)
+    return res.redirect('/dashboard')
+    
+    // return res.redirect('/bugs')
+}
+})
+
+router
+.route('/bugs/updatebug').post(async(req,res)=>{
+    if(req.session.user.role){
+        if(role === 'user'){
+            let {title,description} = req.body
+            var update_obj = {title,description} 
+            
+        }
+        if(role === 'manager'){
+            let {title,description,priority,status,assignedDeveloper,assignedTester} = req.body
+            var update_obj = {title,description,priority,status,assignedDeveloper,assignedTester} 
+            
+        }
+        if(role === 'tester' || role === 'developer'){
+            let {title,description,priority,status} = req.body
+            var update_obj = {title,description,priority,status} 
+            
+        }
+        let bugid = req.params.bugId
+        const updated_bug = bugData.updateBug(bugid,update_obj)
+        return res.json(updated_bug)
+
+    }
+    else{return res.status(400).json({error:'No role found for the user'})}
+
+
+
 })
 
 router

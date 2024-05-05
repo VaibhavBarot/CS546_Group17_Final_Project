@@ -48,7 +48,7 @@ export const getAllProjects = async () =>{
     return allProjects;
 };
 // console.log(await getAllProjects())
-const getProject=async(projectId)=>{
+export const getProject=async(projectId)=>{
     // projectId=projectId.trim();
     if(!projectId || !ObjectId.isValid(projectId)){throw "Id is empty or invalid."}
     validation.checkString(projectId,"projectId");

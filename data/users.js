@@ -2,6 +2,8 @@ import bcrypt from 'bcryptjs';
 import validation from '../validation.js';
 import {users} from '../config/mongoCollections.js'
 import {ObjectId} from 'mongodb';
+import exportedHelpers from '../helpers.js';
+import e from 'express';
 
 
 export const registerUser = async(
@@ -52,6 +54,10 @@ validation.checkEmail(email);
 
  },)
  if(!create_user) throw "User not registered"
+ if(role === 'tester' || role === 'developer'){
+    exportedHelpers.sendEmail(email,'You are added to BugTracker.',"Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you.")
+
+ }
  return {id:create_user.insertedId,firstName:firstName,lastName:lastName,email:email,role:role};
 
 }
@@ -101,4 +107,11 @@ export const getUsers = async(members_id) =>{
 
 }
 
-export default{registerUser,loginUser,getUsers}
+export const getUser = async (user_id)=>{
+    const usersCollection = await users()
+    const user = await usersCollection.findOne({_id:new ObjectId()})
+    return user
+
+}
+
+export default{registerUser,loginUser,getUsers,getUser}
