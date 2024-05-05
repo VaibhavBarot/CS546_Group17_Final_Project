@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
-// import { dbConnection } from "../config/mongoConnection.js";
-import { projects } from "../config/mongoCollections.js";
+import {projects} from "../config/mongoCollections.js"
+import {users} from '../config/mongoCollections.js'
 import validation from '../validation.js';
 const createProjects=async(
     projectName,
@@ -80,7 +80,9 @@ const updateProject=async(projectId,updateProductObject)=>{
     if(updateProductObject.members){
         if(validation.validateMembers(updateProductObject.members,"Members"))
         {
-            project.members=updateProductObject.members;
+            project.members=updateProductObject.members.forEach(element=>{
+                element:new ObjectId(element)
+            });
         }
     }
     else{
@@ -103,7 +105,29 @@ const  deleteProject=async (projectId)=>{
     if(!deletingProject) throw "Project deletion  Failed.";
     return true;
 }
-
+const addMember=async(projectId,memberEmail)=>{
+    if(!projectId||!memberEmail||!ObjectId.isValid(projectId)) throw "Invalid input provided"
+    const projectCollection=await projects();
+    const usersCollection=await users();
+    const user=await usersCollection.findOne({email:memberEmail})
+    if(!user) throw "User does not exist"
+    const project=await projectCollection.findOne({_id:new ObjectId(projectId)});
+    if(!(user.role =='developer'|| user.role =='tester')) throw "Only developers and testers can be added"
+    project.members.forEach(element=>{
+    //     if(element===memberId){
+    //        throw `This user is already a member of the Project.`;  
+    //    }
+        if(element.equals(user._id)) throw"Already a member of project"
+    })
+    project['members'].push(user._id);
+    const updatedproject=await projectCollection.findOneAndUpdate({"_id":new ObjectId(projectId)},{$set:project},{returnDocument:'after'});
+    // console.log(updatedproject);
+    if(!updatedproject) throw "Add Member Failed";
+    const fetchupdatedproject= await  projectCollection.findOne({_id: new ObjectId(projectId)});
+    return fetchupdatedproject;
+    // console.log(project["members"])
+    // return project;
+};
 export const searchProjects =async(searchInput)=>{
     searchInput =searchInput.trim()
     const projectsCollection = await projects() 
@@ -117,8 +141,22 @@ export const searchProjects =async(searchInput)=>{
 
 
 }
-
-
-
-
-export default {createProjects,getAllProjects,getProject,deleteProject,updateProject,searchProjects};
+// const deleteMember=async(projectId,memberEmail)=>{
+//     if(!projectId||!memberId||!ObjectId.isValid(projectId)||!ObjectId.isValid(memberId)) throw "Invalid Id provided"
+//     const projectCollection=await projects();
+//     const project=await projectCollection.findOne({_id:new ObjectId(projectId)});
+//     memberId=new ObjectId(memberId);
+//     let index = project.members.indexOf(memberId); 
+//     if (index !== -1) {
+//         project.members.splice(index, 1); 
+//         console.log(project.members)
+//     }
+//     const updatedproject=await projectCollection.findOneAndUpdate({"_id":new ObjectId(projectId)},{$set:project},{returnDocument:'after'});
+//     // console.log(updatedproject);
+//     if(!updatedproject) throw "Delete Member Failed";
+//     const fetchupdatedproject= await  projectCollection.findOne({_id: new ObjectId(projectId)});
+//     return fetchupdatedproject;
+//     // console.log(project["members"])
+//     // return project;
+// };
+export default {createProjects,getAllProjects,getProject,deleteProject,updateProject,addMember,searchProjects};

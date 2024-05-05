@@ -1,9 +1,10 @@
 import {Router} from 'express';
-import { registerUser, loginUser } from '../data/users.js';
+import { registerUser, loginUser, updatePassword} from '../data/users.js';
 import {getAllUserBugs} from '../data/bugs.js';
 import validation from '../validation.js';
 import moment from 'moment';
 import { getAllUserProjects,getAllProjects } from '../data/projects.js';
+import xss from 'xss'
 
 const router = Router()
 router.route('/').get(async(req,res) => {
@@ -17,7 +18,13 @@ router.route('/register')
 
 .post(async(req,res) => {
     try{
-        let {fname,lname,email,password,confirmPassword,role} = req.body;
+        let fname=xss(req.body.fname);
+        let lname=xss(req.body.lname);
+        let email=xss(req.body.email);
+        let password=xss(req.body.password);
+        let confirmPassword=xss(req.body.confirmPassword);
+        let role=xss(req.body.role);
+        // let {fname,lname,email,password,confirmPassword,role} = req.body;
 
         // if(!fname || !lname || !email || !password || !role) throw "All fields must be supplied";
         const fields = [
@@ -26,7 +33,7 @@ router.route('/register')
             { value: email, name: 'Email' },
             { value: password, name: 'Password' },
             { value: confirmPassword, name:'Confirm Password'},
-            { value: role, name: 'Role'}
+            { value: role, name: 'Role'},            
         ];
         
         for (const field of fields) {
@@ -45,7 +52,7 @@ router.route('/register')
 
         if(!result) return res.status(500).send({error:'Internal Server Error'});
 
-        return res.redirect('/dashboard');
+        return res.redirect('/login');
     } catch(e){
         res.status(400).render('register',{error:true,msg:e})
     }
@@ -67,7 +74,9 @@ router.route('/login')
     return res.render('login',{title:"login"})
  })
 .post(async(req,res)=>{
-    let {email,password} = req.body
+    let email=xss(req.body.email);
+    let password=xss(req.body.password);
+    // let {email,password} = req.body
    
     try{
         if(!email || !password){
@@ -76,7 +85,7 @@ router.route('/login')
     
       
             email = email.toLowerCase()
-        email = validation.checkString(email,'Email')
+            email = validation.checkString(email,'Email')
         // validation.checkEmail(email)
         
             password = validation.checkString(password,'password')
@@ -86,8 +95,14 @@ router.route('/login')
         let result = await loginUser(email,password)
         if(!result) return res.status(500).send({error:'Internal Server Error'});
         req.session.user = result;
-        res.locals.isLoggedIn = true;
-        return res.redirect('/dashboard');
+        if(req.session.user.firstLogin)
+        {
+            return res.redirect('/firstLogin')
+        }
+        else{
+            res.locals.isLoggedIn = true;
+            return res.redirect('/dashboard');
+        }   
     }
         catch(e)
         {
@@ -97,6 +112,31 @@ router.route('/login')
 
     
 }) 
+router.route('/firstLogin')
+.get(async(req,res)=>{
+    return res.render('firstLogin')
+})
+.post(async(req,res)=>{
+        let {email,oldPassword,newPassword} = req.body
+    try{
+        if(!oldPassword || !newPassword ){
+            return res.status(400).render('firstLogin',{error:true})
+          }
+            email = req.session.user.email
+            email = validation.checkString(email,'Email')
+            oldPassword = validation.checkString(oldPassword,'Old Password')
+            validation.checkPassword(oldPassword,'Old Password')
+            newPassword = validation.checkString(newPassword,'New Password')
+            validation.checkPassword(newPassword,'New Password')
+            await updatePassword(email, oldPassword, newPassword);
+            req.session.user.firstLogin = false;
+            return res.redirect('/dashboard')
+
+    }
+    catch(e){
+        console.log(e)
+    }
+})
 
 router.route('/dashboard')
 .get(async (req, res) => {

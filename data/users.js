@@ -15,7 +15,11 @@ export const registerUser = async(
 ) =>{
 
     const usersCollection = await users()
-    let reg_user = {fname:firstName, lname:lastName, email:email, password:password, role:role}
+    let firstLogin = false;
+    if(role !== 'user'){
+        firstLogin = true
+    }
+    let reg_user = {fname:firstName, lname:lastName, email:email, password:password, role:role, firstLogin:firstLogin}
 //   if(!firstName || !lastName || !username || !email || !password) throw "All fields must be supplied"
 const fields = [
     { value: firstName, name: 'First name' },
@@ -29,7 +33,7 @@ for (const field of fields) {
         throw (field.name + ' cannot be empty');
     }
 }
-  validation.checkUser(reg_user)
+validation.checkUser(reg_user)
 
  const user = await usersCollection.findOne({email});
 
@@ -50,7 +54,8 @@ validation.checkEmail(email);
     lastName,
     email,
     password,
-    role
+    role,
+    firstLogin
 
  },)
  if(!create_user) throw "User not registered"
@@ -58,7 +63,8 @@ validation.checkEmail(email);
     exportedHelpers.sendEmail(email,'You are added to BugTracker.',"Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you.")
 
  }
- return {id:create_user.insertedId,firstName:firstName,lastName:lastName,email:email,role:role};
+ 
+ return {id:create_user.insertedId,firstName:firstName,lastName:lastName,email:email,role:role, firstLogin:firstLogin};
 
 }
 
@@ -114,4 +120,40 @@ export const getUser = async (user_id)=>{
 
 }
 
-export default{registerUser,loginUser,getUsers,getUser}
+export const updatePassword = async(email, oldPassword, newPassword) =>{
+    const usersCollection = await users()
+    
+    if(!email || !oldPassword || !newPassword){
+        throw "All fields mus be supplied"
+    }
+    email = email.toLowerCase()
+    email = validation.checkString(email,'Email')
+    oldPassword = validation.checkString(oldPassword,'Old Password')
+    validation.checkPassword(oldPassword,'Old Password')
+    newPassword = validation.checkString(newPassword,'New Password')
+    validation.checkPassword(newPassword,'New Password')
+    const hashed_new_password = await bcrypt.hash(newPassword, 10)
+    newPassword = hashed_new_password
+    const user = await usersCollection.findOne({email: email.toLowerCase()})
+    if(!user){
+        throw "User not found"
+    }
+    // if(oldPassword !== user.password){
+    //     throw "Old Password is incorrect";
+    // }
+    const old_password_match = await bcrypt.compare(oldPassword, user.password)
+    if(!old_password_match){
+        throw "Old Password is incorrect"
+   }
+    const result = await usersCollection.updateOne({email: email.toLowerCase()},{$set:{password: hashed_new_password,firstLogin:false}});
+    if(result.modifiedCount === 0){
+        throw "Password not updated"
+    }
+    return {'passwordUpdated':true}
+
+
+
+
+}
+
+export default{registerUser,loginUser,getUsers, updatePassword, getUser}

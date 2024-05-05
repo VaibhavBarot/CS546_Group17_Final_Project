@@ -90,8 +90,8 @@ const exportedMethods = {
     email = this.checkString(email, 'Email');
     //this.checkEmail(email);
     password = this.checkString(password, 'Password');
-    role = this.checkString(role, 'Role');
-
+    role = this.checkString(role, 'Role'); 
+   
     return {fname,lname,email,password,role};
   },
 
@@ -112,7 +112,9 @@ const exportedMethods = {
     this.checkString(title, 'Title');
     this.checkString(description, 'Desription');
     this.checkString(status, 'Status');
+    this.checkStatus(status)
     this.checkString(priority, 'Priority');
+    this.checkStatus(priority)
     this.checkNumber(estimatedTime, 'Estimated Time');
     this.checkId(creator, 'Creator');
     this.checkId(assignedTo,'Assigned To');
@@ -129,7 +131,25 @@ const exportedMethods = {
     this.checkString(content,'Content'),
     this.checkId(userId,'User Id'),
     this.checkStringArray(files,'Files')
+  },
+  checkStatus(inputStatus){
+    let valid_status = ['In Progress','To Do','Completed','Tesing','In Review']
+  
+  if (valid_status.includes(inputStatus)){return true}
+  else{throw 'Invalid Status'}
+  
+  
+  },
+  checkPriority(inputPriority){
+    let valid_priority = ['High','Medium','Low']
+  
+  if (valid_priority.includes(inputPriority)){return true}
+  else{throw 'Invalid Priority'}
+  
+  
   }
 };
+
+
 
 export default exportedMethods;

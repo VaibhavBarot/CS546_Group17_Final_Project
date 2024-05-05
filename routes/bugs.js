@@ -4,6 +4,7 @@ import moment from "moment";
 import validation from '../validation.js';
 import { bugData, userData } from '../data/index.js';
 import { getAllUserBugs } from '../data/bugs.js';
+import xss from 'xss';
 import { projectData } from '../data/index.js';
 import { getUsers } from '../data/users.js';
 import { getProject } from '../data/projects.js';
@@ -17,22 +18,28 @@ router
     return res.render('bugPage',{role:req.session.user.role,bugs:bugs})
 })
 .post(async(req, res) =>{
-    console.log("Innnn")
-    let{
-    title,
-    description,
-    status,
-    priority,
-    assignedTo,
-    members,
-    projectId,
-    
-
-    } = req.body
-
-    let creator = new ObjectId(user.session.user._id)
-    let createdAt = new Date()
-
+    // let{
+    // title,
+    // description,
+    // creator,
+    // status,
+    // priority,
+    // assignedTo,
+    // members,
+    // projectId,
+    // estimatedTime,
+    // createdAt,
+    // } = req.body
+    let title=xss(req.body.title);
+    let description=xss(req.body.description);
+    let creator=xss(req.body.creator);
+    let status=xss(req.body.status);
+    let priority=xss(req.body.priority);
+    let assignedTo=xss(req.body.assignedTo);
+    let members=xss(req.body.members);
+    let projectId=xss(req.body.projectId);
+    let estimatedTime=xss(req.body.estimatedTime);
+    let createdAt=xss(req.body.createdAt);
     try{
         if(!title || !description || !creator || !status || !priority || !assignedTo || !members || !projectId || !createdAt)
     {
@@ -75,7 +82,6 @@ router
     return res.render('createbug', {members:project.members});
 })
 .post(async (req,res) => {
-    console.log(req.body)
     const {title, description} = req.body
     const projectId = req.params.projectId
     if (req.session.user){
@@ -118,7 +124,6 @@ router
         
     }
     const bug= await bugData.createBug(bug_obj)
-    console.log("bug data ",bug)
     return res.redirect('/dashboard')
     
     // return res.redirect('/bugs')
