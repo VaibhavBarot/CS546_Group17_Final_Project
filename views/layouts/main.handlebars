@@ -12,6 +12,10 @@
     <a href="/logout" class="btn btn-dark btn-logout">Logout</a><br><br>
     {{/if}}
     {{{body}}}
-    
+    {{#if error}}
+    <div id="error" class="alert alert-danger" role="alert">
+        <p>{{msg}}</p>
+    </div>
+   {{/if}}
      </body>
 </html>
