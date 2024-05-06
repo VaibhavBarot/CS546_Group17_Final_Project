@@ -103,7 +103,8 @@ export const getUsers = async (members_id) => {
         firstName: user_details.firstName,
         lastName: user_details.lastName,
         email: user_details.email,
-        role: user_details.role
+        role: user_details.role,
+        _id: user_details._id
     }
 
 }

@@ -63,8 +63,8 @@ const dummyBugData = (users,projects) => { return [
         "title": "Image upload not working",
         "description": "Users are unable to upload images to their profiles.",
         "creator": users[1],
-        "status": "In Progress",
-        "priority": "Medium",
+        "status": "inprogress",
+        "priority": "medium",
         "assignedManager": users[0],
         "assignedTester": users[2],
         "assignedDeveloper": users[3],
@@ -73,9 +73,9 @@ const dummyBugData = (users,projects) => { return [
         "createdAt": "2024-04-26T12:00:00Z",
         "comments": [
           {
-            "commenter": users[3],
-            "text": "I'll look into this issue.",
-            "createdAt": "2024-04-26T12:10:00Z"
+            "userId": users[3],
+            "content": "I'll look into this issue.",
+            "createdAt": "2024-04-26T12:10:00Z",
           }
         ]
       },
@@ -83,8 +83,8 @@ const dummyBugData = (users,projects) => { return [
         "title": "Search functionality not returning results",
         "description": "When users search for keywords, no results are displayed.",
         "creator": users[1],
-        "status": "To Do",
-        "priority": "High",
+        "status": "todo",
+        "priority": "high",
         "assignedManager": users[0],
         "assignedTester": users[2],
         "assignedDeveloper": users[3],
@@ -94,8 +94,8 @@ const dummyBugData = (users,projects) => { return [
         "createdAt": "2024-04-26T12:30:00Z",
         "comments": [
           {
-            "commenter": users[0],
-            "text": "This issue needs immediate attention.",
+            "userId": users[0],
+            "content": "This issue needs immediate attention.",
             "createdAt": "2024-04-26T12:35:00Z"
           }
         ]
@@ -105,6 +105,7 @@ const dummyBugData = (users,projects) => { return [
   const insertDummyData = async () => {
     try {
         const dbcon = await dbConnection();
+        await dbcon.dropDatabase();
         users = await dbcon.collection('users').insertMany(await dummyUserData());
         console.log(`${users.insertedCount} Users inserted`);
 

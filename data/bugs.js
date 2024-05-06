@@ -192,7 +192,7 @@ const updateBug = async(
 //    return updated_bug;
 
 const bugsCollection = await bugs()
-const bug = bugsCollection.updateOne({_id:new ObjectId(bugId)},{$set:{updateObject}})
+const bug = await bugsCollection.updateOne({_id:new ObjectId(bugId)},{$set:updateObject})
 return bug
 }
 

@@ -417,15 +417,15 @@ document.addEventListener('DOMContentLoaded',function(){
                             }
 
                             if(role === 'manager'){
-                                if(id === 'assignedto') $(this).removeAttr('disabled');
+                                if(id === 'assignedDeveloper') $(this).removeAttr('disabled');
+                                if(id === 'assignedTester') $(this).removeAttr('disabled');
                             }
-
                         })
                     }
                 })
             })
 
-            // $('#submit-button').on('click', (ev) => {
+            // $('#update-form').on('submit', (ev) => {
             //     let req = {};
 
             //     $('.form-control').each(function (control){

@@ -139,8 +139,9 @@ router
 })
 
 router
-.route('/bugs/updatebug').post(async(req,res)=>{
+.route('/bugs/:bugId/updatebug').post(async(req,res)=>{
     if(req.session.user.role){
+        const role = req.session.user.role;
         if(role === 'user'){
             let {title,description} = req.body
             var update_obj = {title,description} 
@@ -158,7 +159,7 @@ router
         }
         let bugid = req.params.bugId
         const updated_bug = bugData.updateBug(bugid,update_obj)
-        return res.json(updated_bug)
+        res.redirect('../' + req.params.bugId)
 
     }
     else{return res.status(400).json({error:'No role found for the user'})}
@@ -176,17 +177,25 @@ router
         validation.checkString(bugId,'BugId')
         validation.checkId(bugId, 'BugId')
         const get_bug1 = await bugData.getBug(bugId)
-        const members = []
-        if(get_bug1.assignedManager) get_bug1.assignedManager = await getUsers(get_bug1.assignedManager)
-        if(get_bug1.assignedDeveloper) (get_bug1.assignedDeveloper) =  await getUsers(get_bug1.assignedDeveloper)
-        if(get_bug1.assignedTester) (get_bug1.assignedTester) =  await getUsers(get_bug1.assignedTester)
+
+        const {members} = await getProject(req.params.projectId);
+        const developers = [], testers = []
+
+        for await (let member of members){
+            const mem = await getUsers(member);
+            if(mem.role === 'manager') get_bug1.assignedManager = mem;
+            else if(mem.role === 'tester') testers.push(mem);
+            else if(mem.role === 'developer') developers.push(mem);
+        }
+
         if(get_bug1.creator) (get_bug1.creator) =  await  getUsers(get_bug1.creator)
 
         for await (let comment of get_bug1.comments){
             comment.userId = await getUsers(comment.userId)
         }
 
-
+        get_bug1.testers = testers;
+        get_bug1.developers = developers;
         get_bug1.roles = ['manager','tester','developer']
         return res.render('bugdetails',get_bug1)
     }
@@ -203,7 +212,7 @@ router
     try{
    validation.checkBug(updateObject, 'Updated Bug')
    const update_bug = await bugData.updateBug(bugId, updateObject)
-   return res.json(update_bug)
+   return res.redirect('./')
     }
     catch(e)
     {
