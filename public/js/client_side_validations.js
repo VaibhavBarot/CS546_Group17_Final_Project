@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded',function(){
     const dashboard = document.getElementById('dashboard');
     const create_bug_form = document.getElementById('createBug-form');
     const bugDetails = document.getElementById('bug-details-form');
+    const bugpage = document.getElementById('bugpage');
 
     const client_validations = {
   
@@ -22,7 +23,24 @@ document.addEventListener('DOMContentLoaded',function(){
           return strVal;
         },
       
-      
+        getBugColor:function (color){
+            color = color.toUpperCase();
+            switch (color) {
+                case "HIGH" : {
+                    return 'text-bg-danger';
+                }
+                break;
+                case "MEDIUM" : {
+                    return 'text-bg-warning';
+                }
+                break;
+                case "LOW" : {
+                    return 'text-bg-success'
+                }
+                break;
+            }
+        },
+
         checkName(strVal, varName){
           if(strVal.length < 2 || strVal.length > 25 || /\d/.test(strVal)) throw `Invalid ${varName} `
         },
@@ -443,6 +461,41 @@ document.addEventListener('DOMContentLoaded',function(){
                 if(comment !== ''){
 
                 }
+            })
+        }
+
+        if(bugpage){
+            $('#search-button').on('click', function(ev) {
+                const priority = $('#filterPriority').val();
+                const status = $('#filterStatus').val();
+                const search = $('#search').val()
+                const toSort = $('#toSort').val();
+
+            $.ajax({
+                method:'POST',
+                url:`${window.location.href}/filter`,
+                headers: { 'Content-Type': 'application/json'},
+                data: JSON.stringify({filterStatus:status,filterPriority:priority,search:search,toSort:toSort})
+            })
+            .done((data) => {
+                $('#bug-section').empty();
+                data.forEach((bug) => {
+                
+                const html  =  `<div class="card text-center ${client_validations.getBugColor(bug.priority)} mb-3" data-id=${bug._id}}>
+                    <div class="card-header h3">
+                        ${bug.title}
+                        <span class="badge bg-secondary float-end">${bug.status}</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">${bug.description}</p>
+                        <a href="bugs/${bug._id}" class="btn btn-lg btn-primary">View</a>
+                    </div>
+                    </div>`
+                
+                    $('#bug-section').append(html)
+                })
+            }           
+            )
             })
         }
 

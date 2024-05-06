@@ -69,6 +69,9 @@ const exportedHelpers = {
   getStatus:(status) =>{
     return status_map[status]
   },
+  json: function(data) {
+    return JSON.stringify(data);
+  }
 }
 //exportedHelpers.sendEmail('rahuldoshi34@gmail.com','Test','123')
 
