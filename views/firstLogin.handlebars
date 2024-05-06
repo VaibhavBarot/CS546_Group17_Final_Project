@@ -1,0 +1,51 @@
+<div class = "container">
+    
+<p class="h1 text-center my-2 text-bg-dark form-border">Login</p>
+   <form id="reset-password" class="row form-border p-2 g-3 mt-2 justify-content-center" method="post" action="/firstLogin">
+   
+   <div class="row justify-content-center">
+    <div class="col-md-6">
+    <div class="form-group">
+     {{!-- <label for="email"><strong>Email</strong></label>
+        <input type="text" class="form-control" id="email" name="email"> --}}
+        </div>
+       </div>
+        </div>
+
+
+    <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="oldPassword"><strong>Old Password</strong></label>
+                    <input type="password" class="form-control" id="oldPassword" name="oldPassword">
+                </div>
+            </div>
+        </div>
+
+     <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="newPassword"><strong>New Password</strong></label>
+                    <input type="password" class="form-control" id="newPassword" name="newPassword">
+                </div>
+            </div>
+        </div>    
+
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-dark">Reset Password</button>
+                </div>
+            </div>
+        </div>
+        
+   </form>
+   {{!-- <div id="error" class="alert alert-danger invisible" role="alert">
+    {{#if error}}
+    <p>{{msg}}</p>
+    {{/if}}
+   </div> --}}
+   <div id="error" class="alert alert-danger invisible" role="alert"></div>
+</div>
+
+   

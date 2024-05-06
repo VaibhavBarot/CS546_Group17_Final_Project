@@ -90,8 +90,8 @@ const exportedMethods = {
     email = this.checkString(email, 'Email');
     //this.checkEmail(email);
     password = this.checkString(password, 'Password');
-    role = this.checkString(role, 'Role');
-
+    role = this.checkString(role, 'Role'); 
+   
     return {fname,lname,email,password,role};
   },
 
@@ -129,8 +129,8 @@ const exportedMethods = {
     this.checkId(bugId, 'Bug Id'),
     this.checkDate(timestamp,'TimeStamp'),
     this.checkString(content,'Content'),
-    this.checkId(userId,'User Id'),
-    this.checkStringArray(files,'Files')
+    this.checkId(userId.toString(),'User Id')
+    if(files) this.checkString(files,'Files')
   },
   checkStatus(inputStatus){
     let valid_status = ['In Progress','To Do','Completed','Tesing','In Review']
@@ -145,8 +145,6 @@ const exportedMethods = {
   
   if (valid_priority.includes(inputPriority)){return true}
   else{throw 'Invalid Priority'}
-  
-  
   }
 };
 

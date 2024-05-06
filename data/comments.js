@@ -1,20 +1,21 @@
-import { dbConnection, closeConnection } from "../config/mongoConnection.js";
+import { bugs } from "../config/mongoCollections.js";
 import { ObjectId, ReturnDocument, ServerApiVersion } from 'mongodb'
 import moment from "moment"
 import validation from '../validation.js'
 
-const createComment = async (
+export const createComment = async (
     bugId,
    updateObject_comment
     
 ) => {
-    let {userId, timestamp, content,files} = updateObject_comment
-    let create_comment = {bugId:bugId, userId:userId, timestamp:timestamp, content:content, files:files}
-    if(!bugId || !userId || !timestamp || !content || !files) throw "All fields must be Supplied"
+    let {userId,content,files} = updateObject_comment
+    let create_comment = {bugId:bugId, userId: new ObjectId(userId), content:content, files:files}
+    let timestamp = moment().format("ddd MMM DD YYYY HH:mm:ss");
+    create_comment.timestamp = timestamp;
+    if(!bugId || !userId || !timestamp || !content) throw "All fields must be Supplied"
     validation.checkComment(create_comment,'Comment Created')
-    const dbcon = await dbConnection()
-    // const files = []
-    const bug_comment = await dbcon.collection('bugs').findOne({_id: new ObjectId(bugId)});
+    const bugsCollection = await bugs()
+    const bug_comment = await bugsCollection.findOne({_id: new ObjectId(bugId)});
     if(!bug_comment)
     {
         throw "Bug not found"
@@ -23,13 +24,13 @@ const createComment = async (
     // const bugId = new ObjectId();
     const bug1 = {
       _id: bugId,
-      timestamp: moment().format("ddd MMM DD YYYY HH:mm:ss"),
+      timestamp: timestamp,
       content: content.trim(),
       userId: userId,
       files: files
     }
 
-    await dbcon.collection('bugs').updateOne(
+    await bugsCollection.updateOne(
         {
             _id: new ObjectId(bugId)
         },
@@ -44,8 +45,8 @@ const getAllComments = async (bugId) => {
     validation.checkString(bugId, 'Bug ID')
     validation.checkId(bugId, 'Bug ID')
 
-    const dbcon = await dbConnection();
-    const bug = await dbcon.collection('bugs').findOne({_id: new ObjectId(bugId)})
+    const bugsCollection = await bugs()
+    const bug = await bugsCollection.findOne({_id: new ObjectId(bugId)})
     if(!bug)
     {
         throw "Project Not Found"
@@ -56,8 +57,8 @@ const getAllComments = async (bugId) => {
 const getComment = async (commentId) => {
     validation.checkString(commentId, 'Comment')
     validation.checkId(commentId, 'Comment')
-    const dbcon = await dbConnection();
-    const bug_data = await dbcon.collection('bugs').find({}).toArray()
+    const bugsCollection = await bugs()
+    const bug_data = await bugsCollection.find({}).toArray()
     let comment;
     for(const bug1  of bug_data)
     {
@@ -81,8 +82,8 @@ const updateComment = async (commentId, updateObject) =>{
     validation.checkDate(timestamp,'timestamp')
     validation.checkString(content,'Content')
     validation.checkStringArray(files,'files')
-    const dbcon = await dbConnection()
-    const update_comm1 = await dbcon.collection('bugs').findOne({'comments._id': commentId})
+    const bugsCollection = await bugs()
+    const update_comm1 = await bugsCollection.findOne({'comments._id': commentId})
     if(!update_comm1)
     {
         throw "Comment not found"
@@ -98,7 +99,7 @@ const updateComment = async (commentId, updateObject) =>{
     if (updateObject.timestamp) update_comm1.comments[update_comm1_index].timestamp = updateObject.timestamp;
     
     
-    const updatedDocument = await dbcon.collection('bugs').findOneAndUpdate(
+    const updatedDocument = await bugsCollection.findOneAndUpdate(
         { 'comments._id': commentId },
         { $set: { 'comments.$': update_comm1.comments[update_comm1_index] } },
         { returnDocument: 'after' }
@@ -110,8 +111,8 @@ const updateComment = async (commentId, updateObject) =>{
 const removeComment = async (commentId) => {
     validation.checkString(commentId, 'Comment Id')
     validation.checkId(commentId, 'Comment Id')
-    const dbcon = await dbConnection();
-    const del_comment = await dbcon.collection('bugs').findOneAndUpdate(
+    const bugsCollection = await bugs()
+    const del_comment = await bugsCollection.findOneAndUpdate(
         { 'comments._id': commentId },
         { $pull: { comments: { _id: commentId } } }, 
         { returnDocument: 'after' } 

@@ -1,10 +1,12 @@
 import {Router} from 'express';
-import { registerUser, loginUser } from '../data/users.js';
+import { registerUser, loginUser, updatePassword} from '../data/users.js';
 import {getAllUserBugs} from '../data/bugs.js';
 import validation from '../validation.js';
 import moment from 'moment';
-import { getAllUserProjects } from '../data/projects.js';
+import { getAllUserProjects,getAllProjects } from '../data/projects.js';
 import xss from 'xss'
+import { projectData } from '../data/index.js';
+
 const router = Router()
 router.route('/').get(async(req,res) => {
     return res.json({error: 'YOU SHOULD NOT BE HERE!'});
@@ -32,7 +34,7 @@ router.route('/register')
             { value: email, name: 'Email' },
             { value: password, name: 'Password' },
             { value: confirmPassword, name:'Confirm Password'},
-            { value: role, name: 'Role'}
+            { value: role, name: 'Role'},            
         ];
         
         for (const field of fields) {
@@ -51,17 +53,46 @@ router.route('/register')
 
         if(!result) return res.status(500).send({error:'Internal Server Error'});
 
-        req.session.user = result;
-
-        return res.redirect('/dashboard');
+        return res.redirect('/login');
     } catch(e){
-        console.log(e);
+        res.status(400).render('register',{error:true,msg:e})
     }
 })
 
 router.route('/admin')
 .get(async(req,res) => {
     return res.render('admin');
+})
+
+router
+.route('/dashboard/createProject')
+.get(async(req,res)=>{
+    return res.render('createProject',{title:'Create Project'});
+})
+.post(async(req,res)=>{
+    let name=xss(req.body.pname);
+    let description=xss(req.body.desc);
+    let creator=req.session.user._id;
+    let members=[];
+    // let creator=xss(req.session.user._id);
+    // let members=xss(req.body.members);
+    // const {name,description,creator,members}= req.body;
+    try{
+        if(!name || !description)throw "All  fields must be filled out.";
+        // if(!name || !description || !creator || !members){
+        //     throw "All  fields must be filled out.";
+        // }
+        validation.checkString(name,'Name');
+        validation.checkString(description,"Description");
+    }catch(e){res.status(400).json({error: e.toString()});}
+    try{
+        // let result=await projectData.createProjects( name,description);
+    let result=await projectData.createProjects( name,description,creator,members);
+    if(!result){
+        return res.status(400).json('Error creating new Project');
+    }
+    return res.redirect('/dashboard');
+    }catch(e){return res.status(500).json({error: e.toString()});}
 })
 
 router.route('/manager')
@@ -86,7 +117,7 @@ router.route('/login')
     
       
             email = email.toLowerCase()
-        email = validation.checkString(email,'Email')
+            email = validation.checkString(email,'Email')
         // validation.checkEmail(email)
         
             password = validation.checkString(password,'password')
@@ -96,24 +127,77 @@ router.route('/login')
         let result = await loginUser(email,password)
         if(!result) return res.status(500).send({error:'Internal Server Error'});
         req.session.user = result;
-        return res.redirect('/dashboard');
+        if(req.session.user.firstLogin)
+        {
+            return res.redirect('/firstLogin')
+        }
+        else{
+            res.locals.isLoggedIn = true;
+            return res.redirect('/dashboard');
+        }   
     }
         catch(e)
         {
-            console.log(e)
+            res.status(400).render('login',{error:true,msg:e})
+            
         }
 
     
 }) 
+router.route('/firstLogin')
+.get(async(req,res)=>{
+    return res.render('firstLogin')
+})
+.post(async(req,res)=>{
+        let {email,oldPassword,newPassword} = req.body
+    try{
+        if(!oldPassword || !newPassword ){
+            return res.status(400).render('firstLogin',{error:true})
+          }
+            email = req.session.user.email
+            email = validation.checkString(email,'Email')
+            oldPassword = validation.checkString(oldPassword,'Old Password')
+            validation.checkPassword(oldPassword,'Old Password')
+            newPassword = validation.checkString(newPassword,'New Password')
+            validation.checkPassword(newPassword,'New Password')
+            await updatePassword(email, oldPassword, newPassword);
+            req.session.user.firstLogin = false;
+            return res.redirect('/dashboard')
+
+    }
+    catch(e){
+        console.log(e)
+    }
+})
 
 router.route('/dashboard')
 .get(async (req, res) => {
     try{
-        const result = await getAllUserProjects(req.session.user._id);
-        return res.render('dashboard',{role:'user',packages:result});
+
+        const result = (req.session.user.role === 'user') ? 
+        await getAllProjects(): 
+        await getAllUserProjects(req.session.user._id) 
+        return res.render('dashboard',{packages:result});
     } catch(e){
         console.log(e);
     }
+})
+
+router.route('/logout')
+.get(async(req,res) => {
+    try{
+        req.session.destroy()
+         res.redirect('/login')
+    }
+    catch(e){
+        console.log(e)
+    }
+
+})
+
+router.route('/getcurrentuserrole')
+.get(async(req,res) => {
+    return res.json(req.session.user.role);
 })
 
 export default router;

@@ -2,41 +2,8 @@ import {Router} from 'express';
 import {projectData} from "../data/index.js";
 import validation from '../validation.js';
 import { ObjectId } from 'mongodb';
-const router = Router();
-import xss from "xss";
-// router
-// .route('/')
-// .get(async (req, res) =>{
-//     try{
-//     let result= await projectData.getAllProjects();
-//     if(!result){
-//         return res.status(401).json({error: "Error in retrieving projects"});
-//     }
-//     res.status(200).json(result);
-//     }catch(e){return res.status(404).json({error: e})}; 
-// })
-// .post(async(req,res)=>{
-//     let name=xss(req.body.pname);
-//     let description=xss(req.body.desc);
-//     let creator=xss(req.session.user._id);
-//     // let members=xss(req.body.members);
-//     // const {name,description,creator,members}= req.body;
-//     try{
-//         if(!name || !description || !creator || !members){
-//             throw "All  fields must be filled out.";
-//         }
-//         validation.checkString(name,'Name');
-//         validation.checkString(description,"Description");
-//     }catch(e){res.status(400).json({error: e.toString()});}
-//     try{
-//     let result=await projectData.createProjects( name,description,creator,members);
-//     if(!result){
-//         return res.status(400).json('Error creating new Project');
-//     }
-//     // console.log(result);
-//     res.json(result);
-//     }catch(e){return res.status(500).json({error: e.toString()});}
-// })
+import { searchProjects } from '../data/projects.js';
+const router = Router({ mergeParams: true });
 
 router
 .route('/')
@@ -49,39 +16,6 @@ router
     res.status(200).json(result);
     }catch(e){return res.status(404).json({error: e})}; 
 })
-
-router
-.route('/createProject')
-.get(async(req,res)=>{
-    return res.render('createProject',{title:'Create Project'});
-})
-.post(async(req,res)=>{
-    let name=xss(req.body.pname);
-    let description=xss(req.body.desc);
-    let creator=new ObjectId("6636d09733cb740dec264bd7");
-    let members=[];
-    // let creator=xss(req.session.user._id);
-    // let members=xss(req.body.members);
-    // const {name,description,creator,members}= req.body;
-    try{
-        if(!name || !description)throw "All  fields must be filled out.";
-        // if(!name || !description || !creator || !members){
-        //     throw "All  fields must be filled out.";
-        // }
-        validation.checkString(name,'Name');
-        validation.checkString(description,"Description");
-    }catch(e){res.status(400).json({error: e.toString()});}
-    try{
-        // let result=await projectData.createProjects( name,description);
-    let result=await projectData.createProjects( name,description,creator,members);
-    if(!result){
-        return res.status(400).json('Error creating new Project');
-    }
-    console.log(result);
-    // res.redirect('/chart')
-    }catch(e){return res.status(500).json({error: e.toString()});}
-})
-
 
 router
 .route("/:projectId")
@@ -117,6 +51,7 @@ router
       return res.status(200).json(ans);
     }catch(e){return res.status(404).json({error: e.toString()});};
     })
+    
 router
 .route('/addMember')
 .post(async(req,res)=>{
@@ -141,4 +76,27 @@ router
         return res.status(400).json({error: e.toString()});
     }
 })
+
+router
+.route('/searchprojects')
+.post(async (req,res) => {
+    try{
+        const {searchText} = req.body;
+        const projects = await searchProjects(searchText);
+        return res.json(projects);
+    } catch(e){
+        res.status(400).json({e:'Error in search'})
+    }
+})
+// .delete(async(req,res)=>{
+//     const memberEmail=req.body.memberEmail;
+//     const projectId=req.body.projectId;
+//     // if(!projectId||!memberId){return res.status(400).json('No Id or Invalid Id provided');}
+//     try{
+//         let data=await projectData.deleteMember(projectId,memberEmail);
+//         return res.status(200).json(data);
+//     }catch(e){
+//         return res.status(400).json({error: e.toString()});
+//     }
+// })
 export default router;

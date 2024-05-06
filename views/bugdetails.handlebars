@@ -1,0 +1,110 @@
+<div id="bug-details-form" class="container">
+    <p class="h1 text-center my-2 text-primary form-border">Bug Details</p>
+    <div class="row gy-2">
+        <div class="col-md-12">
+            <button id="edit-details" class="btn btn-dark">Edit Details</button>
+        </div>
+        <form id="update-form" method="post" action="{{_id}}/updatebug">
+            <div class="col-md-12">
+                <label for="title" class="form-label"><strong>Title</strong></label>
+                <input type="text" class="form-control" id="title" name="title" value="{{title}}" disabled>
+        </div>
+        <div class="col-md-12">
+            <label for="description" class="form-label"><strong>Description</strong></label>
+            <textarea class="form-control" id="description" name="description" disabled>{{description}}</textarea>
+        </div>
+        <div class="col-md-12"> 
+            <p><strong>Creator</strong></p>
+            <p>{{creator.firstName}} {{creator.lastName}}</p>
+        </div>
+        {{#inArray roles user.role}}
+            <div class="col-md-12">
+            <label for="status" class="form-label">Status</label>
+            <select id="status"class="form-select form-control" name="status" disabled>
+                <option value="todo" selected>To Do</option>
+                <option value="inprogress">In Review</option>
+                <option value="inprogress">In Progress</option>
+                <option value="inprogress">In Testing</option>
+                <option value="inprogress">Completed</option>
+            </select>
+        </div>
+            <div class="col-md-12">
+            <label for="priority" class="form-label">Priority</label>
+            <select id="priority" class="form-select form-control" name="priority" disabled>
+                <option value="high" selected>High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
+        </div>
+            <div class="col-md-12">
+                <label for="estimatedtime" class="form-label"><strong>Estimated Hours</strong></label>
+                <input type="text" class="form-control" id="estimatedtime" name="estimatedtime" value="{{estimatedTime}}" disabled>
+            </div>
+        {{else}}
+                <p><strong>Status</strong></p>
+                <p>{{status}}</p>
+                <p><strong>Priority</strong></p>
+                <p>{{priority}}</p>
+                <p><strong>Estimated Hours</strong></p>
+                <p>{{estimatedTime}}</p>
+        {{/inArray}}
+        {{#eq user.role 'manager'}}
+             <div class="col-md-12">
+                <label for="assignedDeveloper" class="form-label">Assigned Developer</label>
+                <select id="assignedDeveloper" class="form-select form-control" name="assignedDeveloper" disabled>
+                    {{#each developers}}
+                        <option value="{{_id}}">{{firstName}} {{lastName}}</option>
+                    {{/each}}
+                </select>
+             </div>
+             <div class="col-md-12">
+                <label for="assignedTester" class="form-label">Assigned Tester</label>
+                <select id="assignedTester" class="form-select form-control" name="assignedTester" disabled>
+                    {{#each testers}}
+                        <option value="{{_id}}">{{firstName}} {{lastName}}</option>
+                    {{/each}}
+                </select>
+             </div>
+        {{else}}
+            <p><strong>Assigned Developer</strong></p>
+            <p>{{assignedDeveloper.firstName}} {{assignedDeveloper.lastName}}</p>
+
+            <p><strong>Assigned Tester</strong></p>
+            <p>{{assignedTester.firstName}} {{assignedTester.lastName}}</p>
+        {{/eq}}
+        <div class="col-md-12"> 
+            <p><strong>Created At</strong></p>
+            <p>{{createdAt}}</p>
+        </div>
+                <div class="col-md-12">
+            <button id="submit-button" class="btn btn-dark form-control" type=="submit" disabled>Submit</button>
+        </div>
+        </form>
+        <div class="col-md-12 card">
+            <div class="card-header"><strong>Comments</strong></div>
+            <div class="card-body">
+                {{#each comments}}
+                    <div class="card">
+                        <div class="card-header">{{userId.firstName}} {{userId.lastName}}</div>
+                        <div class="card-body">
+                            <p class="card-text">{{content}}</p>
+                            {{#if files}}
+                                <img src="/{{files}}" height="100px" width="100px" alt="comment-image">
+                            {{/if}}
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+        <div class="col-md-12 card">
+            <div class="card-body">
+                    <form id="comment-form" method="post" enctype="multipart/form-data">
+                        <textarea class="form-control my-2" id="addcomment-text" name="content" placeholder="add a comment"></textarea>
+                        <label for="fileupload" class="form-label"><strong>Add File(s)</strong></label>
+                        <input class="form-control" type="file" id="fileupload" name="fileupload" accept="image/png, image/jpeg">
+                        <button id="comment-submit" type="submit" class="btn btn-dark my-2">Send</button>
+                    </form>
+            </div>       
+        </div>
+    </div>
+</div>
