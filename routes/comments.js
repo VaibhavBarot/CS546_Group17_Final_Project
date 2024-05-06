@@ -5,20 +5,30 @@ import { ObjectId } from "mongodb";
 import moment from 'moment';
 import validation from '../validation.js';
 import xss from 'xss';
+import path from 'path'
 router
 .route('/:bugId')
 .post(async(req,res)=> {
+    console.log("Heree")
     let bugId = req.params.bugId.trim()
     let timestamp=xss(req.body.timestamp);
     let content=xss(req.body.content);
     let userId=xss(req.body.userId);
     let files=xss(req.body.files);
+   
     // let {timestamp, content, userId, files} = req.body
     try{
         
         let create_comment1 = {bugId:bugId, userId:userId, timestamp:timestamp, content:content, files:files}
     if(!bugId || !userId || !timestamp || !content || !files) throw "All fields must be Supplied"
     validation.checkComment(create_comment1,'Comment Created')
+    const allowedExtensions = ['.jpg', '.jpeg', '.png']
+    const extname = path.extname(files.originalname).toLowerCase();
+    console.log(extname)
+    if(allowedExtensions.includes(extname)== -1){
+        console.log("Innnn")
+        throw 'Unacceptable extension, Accepts only Png, Jpeg, txt and Pdf'
+    }
 
         const create_comment = await commentsData.createComment(bugId,req.body)
         return res.json(create_comment)

@@ -11,6 +11,8 @@ import multer from 'multer'
 import { createComment } from '../data/comments.js';
 import exportedHelpers from "../helpers.js";
 import { addMember } from '../data/projects.js';
+import * as path from 'path'
+import { error } from 'console';
 
 
 const storage = multer.memoryStorage();
@@ -244,20 +246,35 @@ router
 router
 .route('/bugs/:bugId/addcomment')
 .post(upload.single('fileupload'),async (req,res) => {
+    try{
     if (req.file) {
+        console.log(req.file.originalname)
         req.body.file = req.file.originalname
         const fileBuffer = req.file.buffer;
         const filePath = `public/uploads/${req.session.user.email}/${req.params.bugId}/${req.file.originalname}`;
         req.body.files = filePath
+        const allowedExtensions = ['.jpg', '.jpeg', '.png']
+    const extname = path.extname(req.file.originalname).toLowerCase();
+    console.log(extname)
+    if(!allowedExtensions.includes(extname)){
+        console.log("Innnn")
+        throw 'Unacceptable extension, Accepts only Png, Jpeg, txt and Pdf'
+    }
 
         fs.mkdirSync(`public/uploads/${req.session.user.email}/${req.params.bugId}/`, {recursive:true});
         fs.writeFileSync(filePath, fileBuffer);
       }
 
     req.body.userId = req.session.user._id
-    await createComment(req.params.bugId,req.body)
+    await createComment(req.params.bugId,req.body,req.session.user.role)
+
+    
 
     res.redirect('../' + req.params.bugId)
+}
+catch(e){
+    res.redirect(500,'../'+ req.params.bugId)
+}
   
 })
 
