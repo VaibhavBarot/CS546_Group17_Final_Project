@@ -4,6 +4,7 @@ import moment from 'moment';
 import validation from '../validation.js';
 import {getUsers} from '../data/users.js'
 import exportedHelpers from "../helpers.js";
+import MiniSearch from 'minisearch'
 
 const createBug = async (bug_obj) =>
 {
@@ -229,58 +230,65 @@ const sortBugs= (order,bugsArray) =>{
 
 }
 
-const filterBugs = async(filterParams,projectId) =>{
-    let result = []
-    const dbCon = await dbConnection()
-    const bugsCollection = await dbCon.collection('bugs')
-    validation.checkId(projectId,'projectId')
-    projectId = new ObjectId(projectId)
+const filterBugs = async(filterParams,userId,role) =>{
 
-    if (filterParams === null || typeof filterParams !== 'object'){throw 'Invalid paramters'}
+    let results = await getAllUserBugs(userId,role)
 
-    if(Object.keys(filterParams).length == 1 && filterParams.hasOwnProperty('sortBugs')){
-        let bugs = await getAll(projectId)
-        if (filterParams['sortBugs'] === 'H2L'){sortBugs('H2L',bugs)}
-        else if (filterParams['sortBugs'] === 'L2H'){sortBugs('L2H',bugs)}
-        else{throw 'Invalid sorting type'}
-        return bugs
+    if (results){
+        if(filterParams.search.trim().length > 0){
+        let searchTerm = filterParams.search.trim()
+let miniSearch = new MiniSearch({
+    idField:'_id',
+    fields: ['title', 'description'],
+    storeFields: ['title', 'description','priority','status']
+  })
+  
+  miniSearch.addAll(results)
+  
+  results = miniSearch.search(searchTerm)
+//   console.log("SEarch ",results)
+}
+  let status_arr = filterParams.filterStatus
+  let priority_arr = filterParams.filterPriority
+  let filteredBugs = []
+  if(status_arr.length > 0 && priority_arr.length > 0){
+    for (let bug of results){
+        if(status_arr.includes(bug.status) && priority_arr.includes(bug.priority)){filteredBugs.push(bug)}
     }
-    if(filterParams.hasOwnProperty(['filterStatus']) && filterParams.hasOwnProperty(['filterPriority'])){
-        filterParams['filterStatus'] = validation.checkStringArray(filterParams['filterStatus'],'Filter status')
-        filterParams['filterPriority'] = validation.checkStringArray(filterParams['filterPriority'],'Filter Priority')
-        filterParams['filterStatus'].forEach(element => { validation.checkStatus(element)})
-        filterParams['filterPriority'].forEach(element => { validation.checkPriority(element)})
-        result = await bugsCollection.find({priority:{$in:filterParams['filterPriority']},status:{$in:filterParams['filterStatus']},projectId:projectId}).toArray()
+    results = filteredBugs
+
+  }
+  else if(priority_arr.length > 0){
+    for(let bug of results){
+    if(priority_arr.includes(bug.priority)){filteredBugs.push(bug)}
     }
+    results = filteredBugs
     
-    else if (filterParams.hasOwnProperty(['filterStatus'])){
-        filterParams['filterStatus'] = validation.checkStringArray(filterParams['filterStatus'],'Filter status')
-        filterParams['filterStatus'].forEach(element => { validation.checkStatus(element)})
-
-            result = await bugsCollection.find({ status: { $in: filterParams['filterStatus'] },projectId:projectId }).toArray()          
-        
-    }
-    else if (filterParams.hasOwnProperty(['filterPriority'])){
-        filterParams['filterPriority'] = validation.checkStringArray(filterParams['filterPriority'],'Filter Priority')
-        filterParams['filterPriority'].forEach(element => { validation.checkStatus(element)})
-        
-            result = await bugsCollection.find({priority:{$in:filterParams['filterPriority']},projectId:projectId}).toArray()
-                
-    }
-
-    if (filterParams.hasOwnProperty(['sortBugs'])){
-        if (filterParams['sortBugs'] === 'H2L'){sortBugs('H2L',result)}
-        else if (filterParams['sortBugs'] === 'L2H'){sortBugs('L2H',result)}
-        else{throw 'Invalid sort type'}
-
+  }
+  else if(status_arr.length > 0){
+    for(let bug of results){
+        if(status_arr.includes(bug.priority)){filteredBugs.push(bug)}
         }
+        results = filteredBugs
+    
+  }
+  if(filterParams.toSort === 'L2H'){
+    sortBugs('L2H',results)
+  }
+  if(filterParams.toSort === 'H2L'){
+    sortBugs('H2L',results)
+  }
 
+    }
+    return results
 
-    return result
+    
 
 
 
 }
+
+console.log(await filterBugs({'search':'image','filterPriority':['high'],'filterStatus':['todo'],'toSort':'L2H'},'6636c78d1cc7cc084e123642','manager'))
 
 const search =async(searchInput)=>{
     const query = { $text: { $search: `\"${searchInput}\"` } };

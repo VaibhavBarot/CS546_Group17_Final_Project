@@ -7,14 +7,24 @@
         {{/eq}}
     </div>
   <div id="filter" class="card column mb-3 text-bg-light">
-      <div class="col-md-3">
+      <div id="priority" class="col-md-3">
           <select class="form-select">
           <option value="high" selected>High</option>
           <option value="medium">Medium</option>
           <option value="low">Low</option>
           </select>
       </div>
-      <div class="controls col-md-5">
+      <div id="priority" class="col-md-3">
+          <select class="form-select">
+          <option value="None" selected>None</option>
+          <option value="todo">To Do</option>
+          <option value="inprogress">In Progress</option>
+          <option value="inreview">In Review</option>
+          <option value="testing">Testing</option>
+          <option value="completed">Completed</option>
+          </select>
+      </div>
+      <div class="controls col-md-4">
           <input id="event-name" type="text" name="event-name" class="form-control-md col-md-12" placeholder="Enter search text">
       </div>
       <button id="search" class="btn btn-primary btn-lg col-md-2">Search</button>

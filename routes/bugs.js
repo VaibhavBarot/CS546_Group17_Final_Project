@@ -168,6 +168,12 @@ router
 
 })
 
+router.route('/bugs/filter')
+.post(async (req,res) => {
+    const response = await bugData.filterBugs(req.body,req.session.user._id,req.session.user.role);
+    return res.json(response);
+})
+
 router
 .route('/bugs/:bugId')
 .get(async(req,res) => {
