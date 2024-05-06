@@ -6,29 +6,30 @@ const createProjects=async(
     projectName,
     projectDescription,
     creator,
-    projectMembers
+    // projectMembers
 )=>{
-    let project={name:projectName.trim(),description:projectDescription.trim(),creator:creator,members:projectMembers};
-    if(!projectName || !projectDescription || !creator || !projectMembers )
-    {
-        throw "All project fields must be provided."
-    }
+    // let project={name:projectName.trim(),description:projectDescription.trim()};
+    let project={name:projectName.trim(),description:projectDescription.trim(),creator:creator,members:[]};
+    // if(!projectName || !projectDescription || !creator || !projectMembers )
+    // {
+    //     throw "All project fields must be provided."
+    // }
     validation.checkString(projectName,"ProjectName");
     validation.checkString(projectDescription,"ProjectDescription");
-    if(!ObjectId.isValid(creator))
-    {
-        throw "Invalid creator Id."
-    }
-    if(projectMembers.length===0)
-    {
-        throw "Members cant be zero."
-    }
-    projectMembers.forEach(element => {
-        validation.checkString(element,"Member");
-        if (!ObjectId.isValid(element)){
-            throw "One or more member ids are invalid.";
-        }
-    });
+    // if(!ObjectId.isValid(creator))
+    // {
+    //     throw "Invalid creator Id."
+    // }
+    // if(projectMembers.length===0)
+    // {
+    //     throw "Members cant be zero."
+    // }
+    // projectMembers.forEach(element => {
+    //     validation.checkString(element,"Member");
+    //     if (!ObjectId.isValid(element)){
+    //         throw "One or more member ids are invalid.";
+    //     }
+    // });
     const proj=await projects();
     const projs=await proj.find({}).toArray();
     // console.log(users);
@@ -133,7 +134,25 @@ const addMember=async(projectId,memberEmail)=>{
     // console.log(project["members"])
     // return project;
 };
-// const deleteMember=async(projectId,memberEmail)=>{
+const deleteMember=async(projectId,memberEmail)=>{
+    if(!projectId || !memberEmail || !ObjectId.isValid(projectId)) throw "Invalid input provided";
+    const projectCollection = await projects();
+    const usersCollection = await users();
+    const user = await usersCollection.findOne({ email: memberEmail });
+    if (!user) throw "User does not exist";
+    const project = await projectCollection.findOne({ _id: new ObjectId(projectId) });
+    if (!(user.role === 'developer' || user.role === 'tester')) throw "Only developers and testers can be removed";
+    let memberIndex = project.members.findIndex(memberId => memberId.equals(user._id));
+    if (memberIndex === -1) throw "Not a member of the project";
+    project.members.splice(memberIndex, 1);
+    const updatedProject = await projectCollection.findOneAndUpdate(
+        { _id: new ObjectId(projectId) },
+        { $set: { members: project.members } },
+        { returnDocument: 'after' }
+    );
+    if (!updatedProject) throw "Remove Member Failed";
+    const fetchUpdatedProject = await projectCollection.findOne({ _id: new ObjectId(projectId) });
+    return fetchUpdatedProject;
 //     if(!projectId||!memberId||!ObjectId.isValid(projectId)||!ObjectId.isValid(memberId)) throw "Invalid Id provided"
 //     const projectCollection=await projects();
 //     const project=await projectCollection.findOne({_id:new ObjectId(projectId)});
@@ -150,5 +169,5 @@ const addMember=async(projectId,memberEmail)=>{
 //     return fetchupdatedproject;
 //     // console.log(project["members"])
 //     // return project;
-// };
-export default {createProjects,getAllProjects,getProject,deleteProject,updateProject,addMember};
+};
+export default {createProjects,getAllProjects,getProject,deleteProject,updateProject,addMember,deleteMember};
