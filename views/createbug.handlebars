@@ -3,19 +3,19 @@
     <form id="createBug-form" class="row form-border p-2 g-3 mt-2" method="POST" action="createbug">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <label for="name" class="form-label">Title</label>
+                <label for="bug-name" class="form-label">Title</label>
                 <input type="text" class="form-control" id="bug-name" name="title">
             </div>
     </div>
         <div class="col-md-12">
-            <label for="description" class="form-label">Description</label>
+            <label for="bug-description" class="form-label">Description</label>
             <textarea class="form-control" id="bug-description" name="description" rows="3"></textarea>
         </div>
 
         {{#isnt user.role 'user'}}
         <div class="col-md-6">
             <label for="status" class="form-label">Status</label>
-            <select class="form-select" name="status">
+            <select class="form-select" id="status" name="status">
                 <option value="todo" selected>To Do</option>
                 <option value="inprogress">In Review</option>
                 <option value="inprogress">In Progress</option>
@@ -26,7 +26,7 @@
 
         <div class="col-md-6">
             <label for="priority" class="form-label">Priority</label>
-            <select class="form-select" name="priority">
+            <select id ="priority" class="form-select" name="priority">
                 <option value="high" selected>High</option>
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
@@ -37,7 +37,7 @@
         <div class="row justify-content-center my-2">
             <div class="col-md-6">
                 <label for="assignedDeveloper" class="form-label">Add Developer</label>
-                <select class="form-select" name="assignedDeveloper">
+                <select id = "assignedDeveloper" class="form-select" name="assignedDeveloper">
                     {{#each members}}
                         {{#eq role 'developer'}}
                             <option value="{{email}}">{{firstName}} {{lastName}} | {{email}}</option>
@@ -47,7 +47,7 @@
             </div>
             <div class="col-md-6">
                 <label for="assignedTester" class="form-label">Add Tester</label>
-                <select class="form-select" name="assignedTester">
+                <select id = "assignedTester" class="form-select" name="assignedTester">
                     {{#each members}}
                         {{#eq role 'tester'}}
                             <option value="{{email}}">{{firstName}} {{lastName}} | {{email}}</option>

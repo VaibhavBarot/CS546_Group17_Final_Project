@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded',function(){
                         url:`http://localhost:3000/projects/${projectId}`,
                         data: {_id:projectId}
                     })
-                    .done(() => window.location.reload)
+                    .done(() => window.location.reload())
                 })
             })
 

@@ -1,4 +1,4 @@
-<div class="container">
+<div id="container" class="container">
     <p class="h1 text-center my-2 text-bg-danger form-border">Create Manager</p>
     <form id = 'create-manager-signup-form' class="row form-border p-2 g-3 mt-2" method="post" action="/register">
         <div class="col-md-6">
@@ -14,11 +14,11 @@
             <input type="email" class="form-control" id="email" name="email">
         </div>
         <div class="col-md-6">
-            <label for="inputPassword4" class="form-label">Password</label>
+            <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" name="password">
         </div>
          <div class="col-md-6">
-            <label for="inputPassword4" class="form-label">Confirm Password</label>
+            <label for="password" class="form-label">Confirm Password</label>
             <input type="password" class="form-control" id="confirmPassword" name="confirmPassword">
         </div>
         <input type="hidden" value="manager" name="role">

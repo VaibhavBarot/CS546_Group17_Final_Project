@@ -146,7 +146,8 @@ router
         assignedTester:assignedTester || 'Not Assigned',
         assignedManager:assignedManager,
         role:req.session.user.role,
-        creator: req.session.user._id
+        creator: req.session.user._id,
+        projectId:projectId
         
     }
     const bug= await bugData.createBug(bug_obj)
@@ -158,20 +159,36 @@ router
 
 router
 .route('/bugs/:bugId/updatebug').post(async(req,res)=>{
+    try{
     if(req.session.user.role){
         const role = req.session.user.role;
         if(role === 'user'){
             let {title,description} = req.body
+            title = validation.checkString(title,'title')
+            description = validation.checkString(description,'description')
             var update_obj = {title,description} 
             
         }
         if(role === 'manager'){
             let {title,description,priority,status,assignedDeveloper,assignedTester} = req.body
+            title = validation.checkString(title,'title')
+            description = validation.checkString(description,'description')
+            priority = validation.checkBug(priority,'priority')
+            status = validation.checkBug(status,'status')
+            assignedDeveloper = validation.checkBug(assignedDeveloper,'Developer')
+            assignedTester = validation.checkBug(assignedTester,'Tester')
+            // estimatedTime =
+
             var update_obj = {title,description,priority,status,assignedDeveloper,assignedTester} 
             
         }
         if(role === 'tester' || role === 'developer'){
             let {title,description,priority,status} = req.body
+            title = validation.checkString(title,'title')
+            description = validation.checkString(description,'description')
+            priority = validation.checkBug(priority,'priority')
+            status = validation.checkBug(status,'status')
+
             var update_obj = {title,description,priority,status} 
             
         }
@@ -181,6 +198,10 @@ router
 
     }
     else{return res.status(400).json({error:'No role found for the user'})}
+}
+catch(e){
+    res.status(400).render('')
+}
 
 
 

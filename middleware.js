@@ -8,6 +8,16 @@ export const root_middleware = (req,res,next) =>{
         return res.redirect('/login')
         next()
     }
+    
+    else if(req.session.user.role === 'admin')   
+        {
+            res.locals.isLoggedIn = true;
+            res.locals.user = req.session.user;
+            if(req.url !== '/admin'){
+                return res.redirect('/admin')
+            }
+            next()
+        }
     else{
         res.locals.isLoggedIn = true;
         res.locals.user = req.session.user;
@@ -16,8 +26,8 @@ export const root_middleware = (req,res,next) =>{
 };
 
 export const redirect_admin = (req,res,next) =>{
-    if(req.session && req.session.user){
-        return res.redirect('/admin')
+    if(req.session && req.session.user && req.session.user.role !== 'admin'){
+        return res.redirect('/error')
     }
     else{
        next();
