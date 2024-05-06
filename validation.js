@@ -107,20 +107,25 @@ const exportedMethods = {
     }
   },
 
-  checkBug(updateObject){
-    let {title, description,creator,status,priority,assignedTo,members,projectId,estimatedTime,createdAt} = updateObject;
-    this.checkString(title, 'Title');
-    this.checkString(description, 'Desription');
-    this.checkString(status, 'Status');
-    this.checkStatus(status)
-    this.checkString(priority, 'Priority');
-    this.checkStatus(priority)
-    this.checkNumber(estimatedTime, 'Estimated Time');
-    this.checkId(creator, 'Creator');
-    this.checkId(assignedTo,'Assigned To');
-    this.checkId(projectId,'Project Id');
-    this.checkStringArray(members,'Members');
-    this.checkDate(createdAt,'Created At');
+  checkBug(updateObject,role){
+    let {title, description,creator,status,priority,assignedManager,assignedTester,assignedDeveloper,projectId,estimatedTime,createdAt} = updateObject;
+      updateObject.title=this.checkString(title, 'Title');
+      updateObject.description = this.checkString(description, 'Desription');
+
+    if(role === 'developer' || role === 'tester' || role === 'manager'){
+     updateObject.status= this.checkString(status, 'Status');
+      this.checkStatus(status)
+     updateObject.priority= this.checkString(priority, 'Priority');
+      this.checkPriority(priority)
+      let eTime = parseInt(estimatedTime)
+      if(isNaN(eTime) && estimatedTime !== 'notassigned') throw "Estimated Time must be a valid number";
+      // this.checkNumber(estimatedTime, 'Estimated Time');
+    }
+
+    if(role === 'manager'){
+      this.checkId(assignedDeveloper,'Assidenged Developer');
+      this.checkId(assignedTester,'Assigned Tester')
+    }
   },
 
   checkComment(updateObject_comment)
@@ -128,12 +133,12 @@ const exportedMethods = {
     let {bugId, userId, timestamp,content,files} = updateObject_comment;
     this.checkId(bugId, 'Bug Id'),
     this.checkDate(timestamp,'TimeStamp'),
-    this.checkString(content,'Content'),
+    updateObject_comment.content = this.checkString(content,'Content'),
     this.checkId(userId.toString(),'User Id')
     if(files) this.checkString(files,'Files')
   },
   checkStatus(inputStatus){
-    let valid_status = ['In Progress','To Do','Completed','Tesing','In Review']
+    let valid_status = ['inprogress','todo','completed','testing','inreview','notassigned']
   
   if (valid_status.includes(inputStatus)){return true}
   else{throw 'Invalid Status'}
@@ -141,10 +146,16 @@ const exportedMethods = {
   
   },
   checkPriority(inputPriority){
-    let valid_priority = ['High','Medium','Low']
+    let valid_priority = ['high','medium','low','notassigned']
   
   if (valid_priority.includes(inputPriority)){return true}
   else{throw 'Invalid Priority'}
+  },
+
+  checkRole(inputRole){
+    let valid_role = ['user','tester','developer','manager']
+    if(valid_role.includes(inputRole)){return true}
+    else{throw 'Invalid Role'}
   }
 };
 

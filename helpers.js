@@ -10,13 +10,15 @@ const status_map = {
   'inreview' : 'In Review',
    'intesting' : 'In Testing',
    'completed' : 'Completed',
-   'inprogress' : 'In Progress'
+   'inprogress' : 'In Progress',
+   'notassigned': 'Not Assigned'
 }
 
 const priority_map={
   'high' : 'High',
   'medium' : 'Medium',
-  'low' : 'Low'
+  'low' : 'Low',
+  'notassigned':'Not Assigned'
 }
 
 var transporter = nodemailer.createTransport({
@@ -29,6 +31,7 @@ var transporter = nodemailer.createTransport({
 
 const exportedHelpers = {
   getBugColor:function (color){
+    if(color){
       color = color.toUpperCase();
       switch (color) {
           case "HIGH" : {
@@ -44,6 +47,8 @@ const exportedHelpers = {
           }
           break;
       }
+    }
+    else return 'text-bg-light'
   },
   ternary:function(error){
     return (error) ? true : false

@@ -74,25 +74,19 @@ router
     let description=xss(req.body.desc);
     let creator=req.session.user._id;
     let members=[];
-    // let creator=xss(req.session.user._id);
-    // let members=xss(req.body.members);
-    // const {name,description,creator,members}= req.body;
     try{
         if(!name || !description)throw "All  fields must be filled out.";
-        // if(!name || !description || !creator || !members){
-        //     throw "All  fields must be filled out.";
-        // }
         validation.checkString(name,'Name');
         validation.checkString(description,"Description");
     }catch(e){res.status(400).json({error: e.toString()});}
     try{
-        // let result=await projectData.createProjects( name,description);
     let result=await projectData.createProjects( name,description,creator,members);
     if(!result){
         return res.status(400).json('Error creating new Project');
     }
     return res.redirect('/dashboard');
-    }catch(e){return res.status(500).json({error: e.toString()});}
+    }
+    catch(e){return res.status(500).json({error: e.toString()});}
 })
 
 router.route('/manager')
@@ -107,18 +101,13 @@ router.route('/login')
  })
 .post(async(req,res)=>{
     let email=xss(req.body.email);
-    let password=xss(req.body.password);
-    // let {email,password} = req.body
-   
+    let password=xss(req.body.password);   
     try{
         if(!email || !password){
             return res.status(400).render('login',{error:true,msg:'Both email and password are required.'})
         }
-    
-      
             email = email.toLowerCase()
             email = validation.checkString(email,'Email')
-        // validation.checkEmail(email)
         
             password = validation.checkString(password,'password')
             validation.checkPassword(password,'Password')
@@ -166,7 +155,7 @@ router.route('/firstLogin')
 
     }
     catch(e){
-        console.log(e)
+        res.render('firstLogin',{error:true,msg:e})
     }
 })
 

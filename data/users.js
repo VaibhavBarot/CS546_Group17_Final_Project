@@ -47,6 +47,7 @@ validation.checkUser(reg_user)
 validation.checkEmail(email);
 
  const hashed_password = await bcrypt.hash(password, 10)
+ let pass = password
  password = hashed_password
 
  const create_user = await usersCollection.insertOne({
@@ -60,7 +61,7 @@ validation.checkEmail(email);
  },)
  if(!create_user) throw "User not registered"
  if(role === 'tester' || role === 'developer'){
-    exportedHelpers.sendEmail(email,'You are added to BugTracker.',"Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you.")
+    exportedHelpers.sendEmail(email,`You are added to BugTracker.',"Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you. you can use this email for login and your password is ${pass}`)
 
  }
  
@@ -141,6 +142,9 @@ export const updatePassword = async(email, oldPassword, newPassword) =>{
     if(!old_password_match){
         throw "Old Password is incorrect"
    }
+
+   if(oldPassword === newPassword) throw "Both passwords are same"
+    
     const result = await usersCollection.updateOne({email: email.toLowerCase()},{$set:{password: hashed_new_password,firstLogin:false}});
     if(result.modifiedCount === 0){
         throw "Password not updated"
