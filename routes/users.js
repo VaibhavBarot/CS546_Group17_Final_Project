@@ -5,6 +5,7 @@ import validation from '../validation.js';
 import moment from 'moment';
 import { getAllUserProjects,getAllProjects } from '../data/projects.js';
 import xss from 'xss'
+import { projectData } from '../data/index.js';
 
 const router = Router()
 router.route('/').get(async(req,res) => {
@@ -61,6 +62,37 @@ router.route('/register')
 router.route('/admin')
 .get(async(req,res) => {
     return res.render('admin');
+})
+
+router
+.route('/dashboard/createProject')
+.get(async(req,res)=>{
+    return res.render('createProject',{title:'Create Project'});
+})
+.post(async(req,res)=>{
+    let name=xss(req.body.pname);
+    let description=xss(req.body.desc);
+    let creator=req.session.user._id;
+    let members=[];
+    // let creator=xss(req.session.user._id);
+    // let members=xss(req.body.members);
+    // const {name,description,creator,members}= req.body;
+    try{
+        if(!name || !description)throw "All  fields must be filled out.";
+        // if(!name || !description || !creator || !members){
+        //     throw "All  fields must be filled out.";
+        // }
+        validation.checkString(name,'Name');
+        validation.checkString(description,"Description");
+    }catch(e){res.status(400).json({error: e.toString()});}
+    try{
+        // let result=await projectData.createProjects( name,description);
+    let result=await projectData.createProjects( name,description,creator,members);
+    if(!result){
+        return res.status(400).json('Error creating new Project');
+    }
+    return res.redirect('/dashboard');
+    }catch(e){return res.status(500).json({error: e.toString()});}
 })
 
 router.route('/manager')

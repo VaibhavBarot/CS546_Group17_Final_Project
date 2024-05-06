@@ -16,28 +16,6 @@ router
     res.status(200).json(result);
     }catch(e){return res.status(404).json({error: e})}; 
 })
-.post(async(req,res)=>{
-    let name=xss(req.body.name);
-    let description=xss(req.body.description);
-    let creator=xss(req.body.creator);
-    let members=xss(req.body.members);
-    // const {name,description,creator,members}= req.body;
-    try{
-        if(!name || !description || !creator || !members){
-            throw "All  fields must be filled out.";
-        }
-        validation.checkString(name,'Name');
-        validation.checkString(description,"Description");
-    }catch(e){res.status(400).json({error: e.toString()});}
-    try{
-    let result=await projectData.createProjects( name,description,creator,members);
-    if(!result){
-        return res.status(400).json('Error creating new Project');
-    }
-    // console.log(result);
-    res.json(result);
-    }catch(e){return res.status(500).json({error: e.toString()});}
-})
 
 router
 .route("/:projectId")
@@ -82,6 +60,17 @@ router
     // if(!projectId||!memberId||!ObjectId.isValid(projectId)||!ObjectId.isValid(memberId)){return res.status(400).json('No Id or Invalid Id provided');}
     try{
         let data=await projectData.addMember(projectId,memberEmail);
+        return res.status(200).json(data);
+    }catch(e){
+        return res.status(400).json({error: e.toString()});
+    }
+})
+.delete(async(req,res)=>{
+    const memberEmail=req.body.memberEmail;
+    const projectId=req.body.projectId;
+    // if(!projectId||!memberId){return res.status(400).json('No Id or Invalid Id provided');}
+    try{
+        let data=await projectData.deleteMember(projectId,memberEmail);
         return res.status(200).json(data);
     }catch(e){
         return res.status(400).json({error: e.toString()});

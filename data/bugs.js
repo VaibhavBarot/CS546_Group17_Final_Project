@@ -97,11 +97,8 @@ const getAll = async(projectId) => {
    validation.checkString(projectId,'Project ID')
    validation.checkId(projectId,'Project ID')
    projectId = new ObjectId(projectId)
-    const bugs = await bugsCollection.find({projectId:projectId}).toArray()
-    return bugs;
-    // const bugs = await dbcon.collection('')
-
-
+    const result = await bugsCollection.find({projectId:projectId}).toArray()
+    return result;
 }
 
 export const getAllUserBugs = async(userId,role) => {    
@@ -303,16 +300,16 @@ const bugsSummary = async (projectId) =>{
         total_bugs: 0,
         status:{
 
-        'To Do':0,
-        'In Progress': 0,
-        'Completed':0,
-        'In Review':0,
-        'Tesing':0
+        'todo':0,
+        'inprogress': 0,
+        'completed':0,
+        'inreview':0,
+        'tesing':0
         },
         priority:{
-            'High':0,
-            'Medium':0,
-            'Low':0
+            'high':0,
+            'medium':0,
+            'low':0
         }
     }
     const bugs = await getAll(projectId)
@@ -330,4 +327,4 @@ const bugsSummary = async (projectId) =>{
 // console.log(await bugsSummary('6633d3dc2380ed6a4e0a963d'))
 // console.log(await filterBugs({'filterStatus':['To Do'],'filterPriority':['High'],'sortBugs':'L2H'},'6633d3dc2380ed6a4e0a963e'))
 // console.log(await search('search'))
-export default {createBug, getAll, getBug, updateBug, deleteBug, getAllUserBugs,filterBugs,search}
+export default {createBug, getAll, getBug, updateBug, deleteBug, getAllUserBugs,filterBugs,search, bugsSummary}

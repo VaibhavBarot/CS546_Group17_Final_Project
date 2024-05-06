@@ -1,36 +1,7 @@
-{{!-- <header>
+<header>
     <h1>Bugs Summary Page</h1>
-</header> --}}
+</header>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-<style>
-    /*header{
-        text-align: center;
-    }*/
-    .chart-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        max-width: 1200px;
-        margin: auto;
-    }
-
-    .chart-box {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    table {
-        width: 50%;
-        text-align: left;
-        margin-top: 20px;
-    }
-    /*footer{
-        font-weight: bold;
-        text-align: center;
-        margin-top: 10%;
-    }*/
-</style>
 <div class="chart-container">
     <div class="chart-box">
         <canvas id="BugStatus" style="width:100%;max-width:600px"></canvas>
@@ -53,22 +24,7 @@
 </div>
 
 <script>
-let result = {
-    total_bugs: 0,
-    status: {
-        'To Do': 5,
-        'In Progress': 10,
-        'Completed': 8,
-        'In Review': 2,
-        'Testing': 7
-    },
-    priority: {
-        'High': 10,
-        'Medium': 7,
-        'Low': 1
-    }
-};
-
+let result = {{{json summary}}}
 // Status Pie Chart and Table
 let statusKeys = Object.keys(result.status);
 let statusValues = Object.values(result.status);

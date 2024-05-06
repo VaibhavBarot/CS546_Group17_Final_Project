@@ -6,34 +6,23 @@ const createProjects=async(
     projectName,
     projectDescription,
     creator,
-    projectMembers
+    // projectMembers
 )=>{
-    let project={name:projectName.trim(),description:projectDescription.trim(),creator:creator,members:projectMembers};
-    if(!projectName || !projectDescription || !creator || !projectMembers )
-    {
-        throw "All project fields must be provided."
-    }
+    let project={name:projectName.trim(),description:projectDescription.trim(),creator:new ObjectId(creator.trim()),members:[]};
+
     validation.checkString(projectName,"ProjectName");
     validation.checkString(projectDescription,"ProjectDescription");
-    if(!ObjectId.isValid(creator))
+    if(!creator)
     {
         throw "Invalid creator Id."
     }
-    if(projectMembers.length===0)
-    {
-        throw "Members cant be zero."
-    }
-    projectMembers.forEach(element => {
-        validation.checkString(element,"Member");
-        if (!ObjectId.isValid(element)){
-            throw "One or more member ids are invalid.";
-        }
-    });
+
     const projectCollection = await projects()
     const projs=await projectCollection.find({}).toArray();
     // console.log(users);
     projs.forEach(element => {if(element.name.toLowerCase()===project.name.toLowerCase()) throw `A project with the name ${project.name} already exists.`
     });
+    project.members.push(project.creator);
     const result=await projectCollection.insertOne(project);
     if(!result || !result.acknowledged) throw "Project insertion failed!";
     return result;
@@ -128,6 +117,27 @@ export const addMember=async(projectId,memberEmail)=>{
     // console.log(project["members"])
     // return project;
 };
+const deleteMember=async(projectId,memberEmail)=>{
+    if(!projectId || !memberEmail || !ObjectId.isValid(projectId)) throw "Invalid input provided";
+    const projectCollection = await projects();
+    const usersCollection = await users();
+    const user = await usersCollection.findOne({ email: memberEmail });
+    if (!user) throw "User does not exist";
+    const project = await projectCollection.findOne({ _id: new ObjectId(projectId) });
+    if (!(user.role === 'developer' || user.role === 'tester')) throw "Only developers and testers can be removed";
+    let memberIndex = project.members.findIndex(memberId => memberId.equals(user._id));
+    if (memberIndex === -1) throw "Not a member of the project";
+    project.members.splice(memberIndex, 1);
+    const updatedProject = await projectCollection.findOneAndUpdate(
+        { _id: new ObjectId(projectId) },
+        { $set: { members: project.members } },
+        { returnDocument: 'after' }
+    );
+    if (!updatedProject) throw "Remove Member Failed";
+    const fetchUpdatedProject = await projectCollection.findOne({ _id: new ObjectId(projectId) });
+    return fetchUpdatedProject;
+}
+
 export const searchProjects =async(searchInput)=>{
     searchInput =searchInput.trim()
     const projectsCollection = await projects() 
@@ -138,8 +148,6 @@ export const searchProjects =async(searchInput)=>{
     const query = {$text:{$search:`\"${searchInput}\"`}}
     const searchResult = await projectsCollection.find(query).toArray()
     return searchResult
-
-
 }
 // const deleteMember=async(projectId,memberEmail)=>{
 //     if(!projectId||!memberId||!ObjectId.isValid(projectId)||!ObjectId.isValid(memberId)) throw "Invalid Id provided"
@@ -159,4 +167,4 @@ export const searchProjects =async(searchInput)=>{
 //     // console.log(project["members"])
 //     // return project;
 // };
-export default {createProjects,getAllProjects,getProject,deleteProject,updateProject,addMember,searchProjects};
+export default {createProjects,getAllProjects,getProject,deleteProject,updateProject,addMember,searchProjects,deleteMember}

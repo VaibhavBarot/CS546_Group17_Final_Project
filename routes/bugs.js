@@ -22,14 +22,15 @@ const router = Router({mergeParams:true});
 router
 .route('/bugs')
 .get(async (req,res) => {
-    const bugs = await getAllUserBugs(req.session.user._id,req.session.user.role);
+    let bugs = await getAllUserBugs(req.session.user._id,req.session.user.role);
+    bugs = bugs.filter((bug) => bug.projectId.toString() === req.params.projectId)
     bugs.forEach(bug => {
         bug.priority = exportedHelpers.getPriority(bug.priority)
         bug.status = exportedHelpers.getStatus(bug.status)
     });
     
     
-    return res.render('bugPage',{role:req.session.user.role,bugs:bugs})
+    return res.render('bugPage',{role:req.session.user.role,bugs:bugs,roles:['developer','tester','manager']})
 })
 .post(async(req, res) =>{
     // let{
@@ -87,6 +88,21 @@ router
     }
 }
 )
+
+router
+.route('/summary')
+.get(async (req,res) => {
+    const summary = await bugData.bugsSummary(req.params.projectId);
+    res.render('chart', {summary:summary});
+})
+
+router
+.route('/bugs/filter')
+.post(async (req,res) => {
+    const {filterStatus,filterPriority,search,toSort} = req.body;
+    const bugs = await bugData.filterBugs(req.body,req.session.user._id,req.session.user.role);
+   return res.json(bugs);
+})
 
 router
 .route('/bugs/createbug')
