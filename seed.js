@@ -74,7 +74,7 @@ const dummyUserData = async () => { return [
       lastName: "Doshi",
       email: "rahuldoshi34@gmail.com",
       password: await bcrypt.hash("Rahul@123456",10),
-      role: "DEveloper"
+      role: "Developer"
     },
     {
       firstName: "Shailja",
@@ -93,7 +93,7 @@ const dummyUserData = async () => { return [
     {
       firstName: "Harsh",
       lastName: "Patel",
-      email: "vaibhavbarot04@gmail.com",
+      email: "hpatel9802@gmail.com",
       password: await bcrypt.hash("Harsh@123456",10),
       role: "Developer"
     }
@@ -105,32 +105,38 @@ const dummyProjectData = (users) => { return [
         "name":"Website Redesign",
         "description":"Revamp the company website to enhance user experience and modernize its design.",
         "creator":users[0],
-        "members":[users[0],users[1],users[2],users[3]]
+        "members":[users[0],users[4],users[3]]
     },
     {
         "name":"Mobile App Development",
         "description":"Develop a cross-platform mobile application for better reach and accessibility.",
         "creator":users[0],
-        "members":[users[0],users[1],users[2],users[3]]
+        "members":[users[0],users[5],users[3]]
     },
     {
         "name":"Data Analytics Platform",
         "description":"Build a robust platform for analyzing and visualizing data to drive insights and decision-making.",
         "creator":users[0],
-        "members":[users[4],users[6],users[5],users[7]]
+        "members":[users[0],users[5],users[10]]
     },
     {
       "name":"Healthchain",
       "description":"A Blockchain based EHR platform.",
-      "creator":users[9],
-      "members":[users[9],users[10],users[11],users[12]]
+      "creator":users[11],
+      "members":[users[9],users[11],users[8]]
   },
   {
     "name":"SmartTRader",
     "description":"A trading application",
-    "creator":users[10],
-    "members":[users[9],users[10],users[11]]
+    "creator":users[0],
+    "members":[users[0],users[10],users[9]]
 },
+  {
+    "name":"EduTech",
+    "description":"An online education platform",
+    "creator": users[11],
+    "members": [users[11], users[6], users[8]]
+  },
     
   ]}
 
@@ -142,8 +148,8 @@ const dummyBugData = (users,projects) => { return [
         "status": "inprogress",
         "priority": "medium",
         "assignedManager": users[0],
-        "assignedTester": users[2],
-        "assignedDeveloper": users[3],
+        "assignedTester": users[3],
+        "assignedDeveloper": users[4],
         "projectId": projects[0],
         "estimatedTime": 6,
         "createdAt": "2024-04-26T12:00:00Z",
@@ -161,9 +167,9 @@ const dummyBugData = (users,projects) => { return [
         "creator": users[1],
         "status": "todo",
         "priority": "high",
-        "assignedManager": users[0],
-        "assignedTester": users[2],
-        "assignedDeveloper": users[3],
+        "assignedManager": users[11],
+        "assignedTester": users[8],
+        "assignedDeveloper": users[9],
         
         "projectId": projects[3],
         "estimatedTime": 8,
@@ -183,8 +189,8 @@ const dummyBugData = (users,projects) => { return [
         "status": "todo",
         "priority": "high",
         "assignedManager": users[0],
-        "assignedTester": users[2],
-        "assignedDeveloper": users[3],
+        "assignedTester": users[3],
+        "assignedDeveloper": users[4],
         
         "projectId": projects[0],
         "estimatedTime": 8,
@@ -203,9 +209,9 @@ const dummyBugData = (users,projects) => { return [
         "creator": users[5],
         "status": "todo",
         "priority": "high",
-        "assignedManager": users[5],
-        "assignedTester": users[6],
-        "assignedDeveloper": users[7],
+        "assignedManager": users[11],
+        "assignedTester": users[8],
+        "assignedDeveloper": users[9],
         
         "projectId": projects[3],
         "estimatedTime": 8,
@@ -224,9 +230,9 @@ const dummyBugData = (users,projects) => { return [
         "creator": users[5],
         "status": "todo",
         "priority": "high",
-        "assignedManager": users[5],
-        "assignedTester": users[6],
-        "assignedDeveloper": users[7],
+        "assignedManager": users[11],
+        "assignedTester": users[8],
+        "assignedDeveloper": users[9],
         
         "projectId": projects[3],
         "estimatedTime": 8,
@@ -245,11 +251,11 @@ const dummyBugData = (users,projects) => { return [
         "creator": users[5],
         "status": "todo",
         "priority": "high",
-        "assignedManager": users[5],
-        "assignedTester": users[6],
-        "assignedDeveloper": users[7],
+        "assignedManager": users[11],
+        "assignedTester": users[8],
+        "assignedDeveloper": users[9],
         
-        "projectId": projects[3],
+        "projectId": projects[1],
         "estimatedTime": 8,
         "createdAt": "2024-04-26T12:30:00Z",
         "comments": [
@@ -259,9 +265,151 @@ const dummyBugData = (users,projects) => { return [
             "createdAt": "2024-04-26T12:35:00Z"
           }
         ]
+      },
+      {
+        "title": "Profile picture upload error",
+        "description": "Users cannot upload profile pictures; file size error being thrown.",
+        "creator": users[6],
+        "status": "todo",
+        "priority": "high",
+        "assignedManager": users[0],
+        "assignedTester": users[3],
+        "assignedDeveloper": users[4],
+        
+        "projectId": projects[0],
+        "estimatedTime": 6,
+        "createdAt": "2024-04-29T08:00:00Z",
+        "comments": [
+          {
+            "userId": users[2],
+            "content": "File size limit needs to be increased.",
+            "createdAt": "2024-04-29T08:05:00Z"
+          }
+        ]
+      },
+      {
+        "title": "Incorrect data in reports",
+        "description": "Reports generated for the last quarter show incorrect totals.",
+        "creator": users[4],
+        "status": "todo",
+        "priority": "medium",
+        "assignedManager": users[11],
+        "assignedTester": users[8],
+        "assignedDeveloper": users[6],
+        
+        "projectId": projects[5],
+        "estimatedTime": 9,
+        "createdAt": "2024-05-04T08:20:00Z",
+        "comments": [
+          {
+            "userId": users[3],
+            "content": "Review the calculation logic in the report generation module.",
+            "createdAt": "2024-05-04T08:25:00Z"
+          }
+        ]
+      },
+      {
+        "title": "User feedback feature not updating",
+        "description": "The user feedback submission feature freezes and does not update the database with new entries.",
+        "creator": users[7],
+        "status": "inprogress",
+        "priority": "high",
+        "assignedManager": users[11],
+        "assignedTester": users[8],
+        "assignedDeveloper": users[6],
+        
+        "projectId": projects[5],
+        "estimatedTime": 11,
+        "createdAt": "2024-05-05T14:00:00Z",
+        "comments": [
+        ]
+      },
+      {
+        "title": "Email notification failure",
+        "description": "Email notifications are not being sent to users after registration.",
+        "creator": users[5],
+        "status": "inreview",
+        "priority": "low",
+        "assignedManager": users[0],
+        "assignedTester": users[3],
+        "assignedDeveloper": users[4],
+        
+        "projectId": projects[0],
+        "estimatedTime": 3,
+        "createdAt": "2024-04-27T15:45:00Z",
+        "comments": [
+          {
+            "userId": users[2],
+            "content": "SMTP settings may need to be checked.",
+            "createdAt": "2024-04-27T16:00:00Z"
+          }
+        ]
+      },
+      {
+        "title": "Intermittent server downtime",
+        "description": "Server goes down randomly during peak usage hours.",
+        "creator": users[0],
+        "status": "todo",
+        "priority": "low",
+        "assignedManager": users[0],
+        "assignedTester": users[3],
+        "assignedDeveloper": users[4],
+        
+        "projectId": projects[3],
+        "estimatedTime": 10,
+        "createdAt": "2024-04-29T11:30:00Z",
+        "comments": [
+          {
+            "userId": users[2],
+            "content": "Monitor server load and consider scaling options.",
+            "createdAt": "2024-04-29T11:40:00Z"
+          }
+        ]
+      },
+      {
+        "title": "UI rendering issues on mobile",
+        "description": "Mobile app UI elements overlap on smaller screens.",
+        "creator": users[3],
+        "status": "inreview",
+        "priority": "medium",
+        "assignedManager": users[0],
+        "assignedTester": users[3],
+        "assignedDeveloper": users[5],
+        
+        "projectId": projects[1],
+        "estimatedTime": 7,
+        "createdAt": "2024-05-02T09:45:00Z",
+        "comments": [
+          {
+            "userId": users[4],
+            "content": "Adjust CSS for responsive design.",
+            "createdAt": "2024-05-02T10:00:00Z"
+          }
+        ]
+      },
+      {
+        "title": "Data sync error across devices",
+        "description": "Users are experiencing issues with data not syncing properly across different devices.",
+        "creator": users[5],
+        "status": "inprogress",
+        "priority": "high",
+        "assignedManager": users[0],
+        "assignedTester": users[10],
+        "assignedDeveloper": users[9],
+        
+        "projectId": projects[4],
+        "estimatedTime": 10,
+        "createdAt": "2024-05-06T10:45:00Z",
+        "comments": [
+          {
+            "userId": users[1],
+            "content": "Check the synchronization logic and server response times.",
+            "createdAt": "2024-05-06T10:50:00Z"
+          }
+        ]
       }
-
-
+      
+      
   ]}
   
   const insertDummyData = async () => {

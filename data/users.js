@@ -60,8 +60,12 @@ export const registerUser = async(
 
  },)
  if(!create_user) throw "User not registered"
- if(role === 'tester' || role === 'developer' ||role === 'manager' ){
-    exportedHelpers.sendEmail(email,'You are added to BugTracker.',`Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you. you can use this email for login and your password is ${pass}`)
+ if(role === 'tester' || role === 'developer'){
+    exportedHelpers.sendEmail(email,"You are added to BugTracker.",`Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you. you can use this email for login and your password is ${pass}`)
+
+ }
+ if(role === 'manager'){
+    exportedHelpers.sendEmail(email,"You are assigned to a new project",`Congratulations! admin has assigned a new project to you. You can use this email for login and your password is ${pass}`)
 
     }
     

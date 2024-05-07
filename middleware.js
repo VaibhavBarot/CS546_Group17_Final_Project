@@ -19,7 +19,7 @@ export const root_middleware = (req,res,next) =>{
             next()
         }
     else{
-        if(req.url === '/register') return res.redirect('/dashboard')
+        if(req.url === '/register' && req.session.user.role !== 'manager') return res.redirect('/dashboard')
         res.locals.isLoggedIn = true;
         res.locals.user = req.session.user;
     next();

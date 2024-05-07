@@ -82,8 +82,8 @@ const getAll = async (projectId) => {
     validation.checkString(projectId, 'Project ID')
     validation.checkId(projectId, 'Project ID')
     projectId = new ObjectId(projectId)
-    const bugs = await bugsCollection.find({ projectId: projectId }).toArray()
-    return bugs;
+    const bugsdata = await bugsCollection.find({ projectId: projectId }).toArray()
+    return bugsdata;
 
 
 }
@@ -92,12 +92,12 @@ export const getAllUserBugs = async (userId, role, projectId) => {
     const bugsCollection = await bugs()
     if (!userId) throw "Invalid Project ID"
     validation.checkString(userId, 'Project ID')
-    validation.checkId(userId, 'Project ID')
     validation.checkString(role, 'Role')
     validation.checkRole(role)
     userId = new ObjectId(userId)
+    let allBugs = []
     if (role === 'tester') {
-        const allBugs = await bugsCollection.find({
+        allBugs = await bugsCollection.find({
             $or: [
                 { assignedTester: userId },
                 { creator: userId }
@@ -108,7 +108,7 @@ export const getAllUserBugs = async (userId, role, projectId) => {
 
     }
     if (role === 'developer') {
-        const allBugs = await bugsCollection.find({
+        allBugs = await bugsCollection.find({
             $or: [
                 { assignedDeveloper: userId },
                 { creator: userId }
@@ -119,18 +119,18 @@ export const getAllUserBugs = async (userId, role, projectId) => {
 
     }
     if (role === 'manager') {
-        const allBugs = await bugsCollection.find({
+        allBugs = await bugsCollection.find({
             $or: [
                 { assignedManager: userId },
                 { creator: userId }
             ]
         }).toArray();
-        allBugs.filter(bug => bug.projectId.toString() === projectId)
+        allBugs = allBugs.filter(bug => bug.projectId.toString() === projectId)
         return allBugs;
 
     }
     if (role === 'user') {
-        const allBugs = await bugsCollection.find({ creator: userId }).toArray();
+         allBugs = await bugsCollection.find({ creator: userId }).toArray();
         allBugs.filter(bug => bug.projectId.toString() === projectId)
         return allBugs;
 
@@ -181,8 +181,8 @@ const sortBugs = (order, bugsArray) => {
     if (!Array.isArray(bugsArray)) {
         throw "bugsArray must be an array"
     }
-    const HighToLowpriorityOrder = { "High": 1, "Medium": 2, "Low": 3 }
-    const LowToHighpriorityOrder = { "Low": 1, "Medium": 2, "High": 3 }
+    const HighToLowpriorityOrder = { "high": 1, "medium": 2, "low": 3, "notassigned":4 }
+    const LowToHighpriorityOrder = { "low": 1, "medium": 2, "high": 3, "notassigned":4 }
 
 
     if (order === 'H2L') {
@@ -239,17 +239,21 @@ const filterBugs = async (filterParams, userId, role, projectId) => {
         }
         else if (status_arr.length > 0) {
             for (let bug of results) {
-                if (status_arr.includes(bug.priority)) { filteredBugs.push(bug) }
+                if (status_arr.includes(bug.status)) { filteredBugs.push(bug) }
             }
             results = filteredBugs
 
         }
         if (filterParams.toSort === 'L2H') {
+            console.log("Innn")
+            console.log("Results before ",results)
             sortBugs('L2H', results)
+            console.log("Results before ",results)
         }
         if (filterParams.toSort === 'H2L') {
             sortBugs('H2L', results)
         }
+        console.log("Sorted results ",results)
 
     }
     return results
@@ -272,21 +276,21 @@ const bugsSummary = async (projectId) => {
         total_bugs: 0,
         status: {
 
-            'To Do': 0,
-            'In Progress': 0,
-            'Completed': 0,
-            'In Review': 0,
-            'Tesing': 0
+            'todo': 0,
+            'inprogress': 0,
+            'completed': 0,
+            'inreview': 0,
+            'testing': 0
         },
         priority: {
-            'High': 0,
-            'Medium': 0,
-            'Low': 0
+            'high': 0,
+            'medium': 0,
+            'low': 0
         }
     }
-    const bugs = await getAll(projectId)
-    result['total_bugs'] = bugs.length
-    for (let bug of bugs) {
+    const bugsdata = await getAll(projectId)
+    result['total_bugs'] = bugsdata.length
+    for (let bug of bugsdata) {
         result['status'][bug['status']] += 1
         result['priority'][bug['priority']] += 1
     }

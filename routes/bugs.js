@@ -25,7 +25,6 @@ router
 .get(async (req,res) => {
     try{
         let bugs = await getAllUserBugs(req.session.user._id,req.session.user.role, req.params.projectId);
-        bugs = bugs.filter((bug) => bug.projectId.toString() === req.params.projectId)
         bugs.forEach(bug => {
             bug.priority = exportedHelpers.getPriority(bug.priority)
             bug.status = exportedHelpers.getStatus(bug.status)
@@ -40,18 +39,6 @@ router
    
 })
 .post(async(req, res) =>{
-    // let{
-    // title,
-    // description,
-    // creator,
-    // status,
-    // priority,
-    // assignedTo,
-    // members,
-    // projectId,
-    // estimatedTime,
-    // createdAt,
-    // } = req.body
     let title=xss(req.body.title);
     let description=xss(req.body.description);
     let creator=xss(req.body.creator);
@@ -99,8 +86,14 @@ router
 router
 .route('/summary')
 .get(async (req,res) => {
-    const summary = await bugData.bugsSummary(req.params.projectId);
+    try{
+        const summary = await bugData.bugsSummary(req.params.projectId);
     res.render('chart', {summary:summary});
+    }
+    catch(e){
+        return res.status(500).json({error: e})
+    }
+    
 })
 
 router
@@ -108,8 +101,8 @@ router
 .post(async (req,res) => {
     try{
         let {filterStatus,filterPriority,search,toSort} = req.body;
-        filterStatus = xss(filterStatus)
-        filterPriority = xss(filterPriority)
+        filterStatus = filterStatus
+        filterPriority = filterPriority
         search = xss(search)
         toSort = xss(toSort)
         const filter_obj ={
@@ -118,7 +111,7 @@ router
             search,
             toSort
         }
-    const bugs = await bugData.filterBugs(filter_obj,req.session.user._id,req.session.user.role);
+    const bugs = await bugData.filterBugs(filter_obj,req.session.user._id,req.session.user.role, req.params.projectId);
    return res.json(bugs);
     }
     catch(e){
@@ -184,7 +177,7 @@ router
     }
     }
     catch(e){
-        return res.status(404).json({error :e})
+        return res.status(400).render('createbug',{error :true, msg:e})
     }
 })
 
@@ -255,7 +248,7 @@ router
 }
 catch(e)
 {
-    return res.status(404).json({error :e})
+    return res.status(500).render('bugdetails',{error :true,msg:e})
 }
 
 
