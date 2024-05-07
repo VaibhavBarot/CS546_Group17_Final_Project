@@ -350,7 +350,7 @@ const dummyBugData = (users,projects) => { return [
         "description": "Server goes down randomly during peak usage hours.",
         "creator": users[0],
         "status": "todo",
-        "priority": "critical",
+        "priority": "high",
         "assignedManager": users[0],
         "assignedTester": users[3],
         "assignedDeveloper": users[4],
