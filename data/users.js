@@ -160,7 +160,7 @@ export const getAllUsers = async() =>{
     const usersCollection = await users()
 
     let allUsers = await usersCollection.find({}).toArray()
-    return allUsers.filter(user => user.role !== 'manager' && user.role !== 'user')
+    return allUsers.filter(user => user.role === 'developer' || user.role === 'tester')
 }
 
 export default{registerUser,loginUser,getUsers, updatePassword, getUser, getAllUsers}

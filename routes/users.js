@@ -60,7 +60,6 @@ router.route('/admin')
 .get(async(req,res) => {
     return res.render('admin');
 })
-<<<<<<< Updated upstream
 
 router
 .route('/dashboard/createProject')
