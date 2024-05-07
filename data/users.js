@@ -46,14 +46,14 @@ export const registerUser = async(
 
     validation.checkEmail(email);
 
-<<<<<<< Updated upstream
+
  const hashed_password = await bcrypt.hash(password, 10)
  let pass = password
  password = hashed_password
-=======
+
     const hashed_password = await bcrypt.hash(password, 10)
     password = hashed_password
->>>>>>> Stashed changes
+
 
     const create_user = await usersCollection.insertOne({
         firstName,
@@ -63,18 +63,18 @@ export const registerUser = async(
         role,
         firstLogin
 
-<<<<<<< Updated upstream
+
  },)
  if(!create_user) throw "User not registered"
  if(role === 'tester' || role === 'developer'){
     exportedHelpers.sendEmail(email,`You are added to BugTracker.',"Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you. you can use this email for login and your password is ${pass}`)
-=======
+
     },)
     //  console.log(create_user.firstName)
     if(!create_user) throw "User not registered"
     if(role === 'tester' || role === 'developer'){
         exportedHelpers.sendEmail(email,'You are added to BugTracker.',`Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you.you can use this email for login and your password is ${password})`)
->>>>>>> Stashed changes
+
 
     }
     
