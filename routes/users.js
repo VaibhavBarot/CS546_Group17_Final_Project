@@ -5,6 +5,7 @@ import validation from '../validation.js';
 import moment from 'moment';
 import { getAllUserProjects,getAllProjects } from '../data/projects.js';
 import xss from 'xss'
+import { projectData } from '../data/index.js';
 
 const router = Router()
 router.route('/').get(async(req,res) => {
@@ -48,10 +49,8 @@ router.route('/register')
             return res.status(400).render('register',{error:'Password does not match'})
         }
     
-        let result =    await registerUser(fname,lname,email,password,role);
-
+        let result =  await registerUser(fname,lname,email,password,role);
         if(!result) return res.status(500).send({error:'Internal Server Error'});
-
         return res.redirect('/login');
     } catch(e){
         res.status(400).render('register',{error:true,msg:e})
@@ -61,6 +60,31 @@ router.route('/register')
 router.route('/admin')
 .get(async(req,res) => {
     return res.render('admin');
+})
+
+router
+.route('/dashboard/createProject')
+.get(async(req,res)=>{
+    return res.render('createProject',{title:'Create Project'});
+})
+.post(async(req,res)=>{
+    let name=xss(req.body.pname);
+    let description=xss(req.body.desc);
+    let creator=req.session.user._id;
+    let members=[];
+    try{
+        if(!name || !description)throw "All  fields must be filled out.";
+        validation.checkString(name,'Name');
+        validation.checkString(description,"Description");
+    }catch(e){res.status(400).json({error: e.toString()});}
+    try{
+    let result=await projectData.createProjects( name,description,creator,members);
+    if(!result){
+        return res.status(400).json('Error creating new Project');
+    }
+    return res.redirect('/dashboard');
+    }
+    catch(e){return res.status(500).json({error: e.toString()});}
 })
 
 router.route('/manager')
@@ -75,18 +99,13 @@ router.route('/login')
  })
 .post(async(req,res)=>{
     let email=xss(req.body.email);
-    let password=xss(req.body.password);
-    // let {email,password} = req.body
-   
+    let password=xss(req.body.password);   
     try{
         if(!email || !password){
             return res.status(400).render('login',{error:true,msg:'Both email and password are required.'})
         }
-    
-      
             email = email.toLowerCase()
             email = validation.checkString(email,'Email')
-        // validation.checkEmail(email)
         
             password = validation.checkString(password,'password')
             validation.checkPassword(password,'Password')
@@ -134,7 +153,7 @@ router.route('/firstLogin')
 
     }
     catch(e){
-        console.log(e)
+        res.render('firstLogin',{error:true,msg:e})
     }
 })
 

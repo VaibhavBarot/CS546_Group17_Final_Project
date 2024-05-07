@@ -1,4 +1,4 @@
-<div class="container">
+<div id="container" class="container">
     <p class="h1 text-center my-2 text-bg-dark form-border">Add User</p>
     <form id = "create-devtest-signup-form" class="row form-border p-2 g-3 mt-2" method="post" action="/register">
         <div class="col-md-6">
@@ -23,7 +23,7 @@
         </div>
         <div class="col-md-12">
             <label for="role" class="form-label">Role</label>
-            <select class="form-select" name="role">
+            <select class="form-select" id="role" name="role">
                 <option value="developer" selected>Developer</option>
                 <option value="tester">Tester</option>
             </select>

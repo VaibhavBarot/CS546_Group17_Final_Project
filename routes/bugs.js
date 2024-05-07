@@ -4,11 +4,17 @@ import { bugData, userData } from '../data/index.js';
 import { getAllUserBugs } from '../data/bugs.js';
 import xss from 'xss';
 import { projectData } from '../data/index.js';
-import { getUsers } from '../data/users.js';
+import { getAllUsers, getUsers } from '../data/users.js';
 import { getProject } from '../data/projects.js';
 import fs from 'fs';
 import multer from 'multer'
 import { createComment } from '../data/comments.js';
+import exportedHelpers from "../helpers.js";
+import { addMember } from '../data/projects.js';
+import * as path from 'path'
+import { error } from 'console';
+
+
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -17,22 +23,22 @@ const router = Router({mergeParams:true});
 router
 .route('/bugs')
 .get(async (req,res) => {
-    const bugs = await getAllUserBugs(req.session.user._id,req.session.user.role);
-    return res.render('bugPage',{role:req.session.user.role,bugs:bugs})
+    try{
+        let bugs = await getAllUserBugs(req.session.user._id,req.session.user.role, req.params.projectId);
+        bugs.forEach(bug => {
+            bug.priority = exportedHelpers.getPriority(bug.priority)
+            bug.status = exportedHelpers.getStatus(bug.status)
+        });
+        
+        
+        return res.render('bugPage',{role:req.session.user.role,bugs:bugs,roles:['developer','tester','manager']})
+    }
+    catch(e){
+        return res.status(404).json({error :e})
+    }
+   
 })
 .post(async(req, res) =>{
-    // let{
-    // title,
-    // description,
-    // creator,
-    // status,
-    // priority,
-    // assignedTo,
-    // members,
-    // projectId,
-    // estimatedTime,
-    // createdAt,
-    // } = req.body
     let title=xss(req.body.title);
     let description=xss(req.body.description);
     let creator=xss(req.body.creator);
@@ -78,85 +84,172 @@ router
 )
 
 router
-.route('/bugs/createbug')
+.route('/summary')
 .get(async (req,res) => {
-    const project = await projectData.getProject(req.params.projectId);
-    project.members = await getUsers(project.members);
-    return res.render('createbug', {members:project.members});
-})
-.post(async (req,res) => {
-    const {title, description} = req.body
-    const projectId = req.params.projectId
-    if (req.session.user){
-        if(req.session.user.role === 'user'){
-            let project = await getProject(projectId)
-            var assignedManager = project.manager
-
-        }
-    else if(req.session.user.role === 'tester'){
-        var {priority,status,assignedDeveloper} = req.body
-        let project = await getProject(projectId)
-            var assignedManager = project.manager
-        // var bug_obj ={
-        //     title:title,
-        //     description:description,
-        //     priority:priority,
-        //     status:status,
-        //     assignedDeveloper:assignedDeveloper,
-        //     role:req.session.user.role,
-        //     creator: req.session.user._id
-        // }
-        
+    try{
+        const summary = await bugData.bugsSummary(req.params.projectId);
+    res.render('chart', {summary:summary});
     }
-   
-    else if(req.session.user.role === 'manager'){
-        var {priority,status,assignedDeveloper,assignedTester} = req.body
-        var assignedManager = req.session.user._id
-        
+    catch(e){
+        return res.status(500).json({error: e})
     }
-    let bug_obj ={
-        title:title,
-        description:description,
-        priority:priority || 'Not Assigned',
-        status:status || 'Not Assigned',
-        assignedDeveloper:assignedDeveloper || 'Not Assigned',
-        assignedTester:assignedTester || 'Not Assigned',
-        assignedManager:assignedManager,
-        role:req.session.user.role,
-        creator: req.session.user._id
-        
-    }
-    const bug= await bugData.createBug(bug_obj)
-    return res.redirect('/dashboard')
     
-    // return res.redirect('/bugs')
-}
 })
 
 router
-.route('/bugs/updatebug').post(async(req,res)=>{
+.route('/bugs/filter')
+.post(async (req,res) => {
+    try{
+        let {filterStatus,filterPriority,search,toSort} = req.body;
+        filterStatus = filterStatus
+        filterPriority = filterPriority
+        search = xss(search)
+        toSort = xss(toSort)
+        const filter_obj ={
+            filterStatus,
+            filterPriority,
+            search,
+            toSort
+        }
+    const bugs = await bugData.filterBugs(filter_obj,req.session.user._id,req.session.user.role, req.params.projectId);
+   return res.json(bugs);
+    }
+    catch(e){
+        return resstatus(500).json({error: e})
+    }
+    
+})
+
+router
+.route('/bugs/createbug')
+.get(async (req,res) => {
+    const project = await projectData.getProject(req.params.projectId);
+    let members_array = []
+    for await (let members of project.members){
+        let member = await getUsers(members)
+        members_array.push(member)
+    }
+
+    return res.render('createbug', {members:members_array});
+})
+.post(async (req,res) => {
+    try{
+        const {title, description} = req.body
+        const projectId = req.params.projectId
+        if (req.session.user){
+            if(req.session.user.role === 'user'){
+                let project = await getProject(projectId)
+                // console.log("dsv ",project)
+                var assignedManager = project.creator
+                // console.log("dfd ",assignedManager)
+    
+            }
+        else if(req.session.user.role === 'tester'){
+            var {priority,status,assignedDeveloper} = req.body
+            let project = await getProject(projectId)
+                var assignedManager = project.creator
+            
+        }
+       
+        else if(req.session.user.role === 'manager'){
+            var {priority,status,assignedDeveloper,assignedTester,estimatedTime} = req.body
+            var assignedManager = req.session.user._id
+            
+        }
+        let bug_obj ={
+            title:title,
+            description:description,
+            priority:priority || 'notassigned',
+            status:status || 'notassigned',
+            assignedDeveloper:assignedDeveloper || 'notassigned',
+            assignedTester:assignedTester || 'notassigned',
+            assignedManager:assignedManager,
+            role:req.session.user.role,
+            estimatedTime:estimatedTime || 'notassigned',
+            creator: req.session.user._id,
+            projectId:req.params.projectId
+            
+        }
+        const bug= await bugData.createBug(bug_obj)
+        return res.redirect('/dashboard')
+        
+        // return res.redirect('/bugs')
+    }
+    }
+    catch(e){
+        return res.status(400).render('createbug',{error :true, msg:e})
+    }
+})
+
+router
+.route('/bugs/:bugId/updatebug').post(async(req,res)=>{
+    try{
     if(req.session.user.role){
+        const role = req.session.user.role;
         if(role === 'user'){
             let {title,description} = req.body
+            title = validation.checkString(title,'title')
+            description = validation.checkString(description,'description')
             var update_obj = {title,description} 
             
         }
         if(role === 'manager'){
             let {title,description,priority,status,assignedDeveloper,assignedTester} = req.body
+            title = validation.checkString(title,'title')
+            description = validation.checkString(description,'description')
+            // priority = validation.checkBug(priority,'priority')
+            // status = validation.checkBug(status,'status')
+            // assignedDeveloper = validation.checkBug(assignedDeveloper,'Developer')
+            // assignedTester = validation.checkBug(assignedTester,'Tester')
+            // estimatedTime =
+
             var update_obj = {title,description,priority,status,assignedDeveloper,assignedTester} 
             
         }
         if(role === 'tester' || role === 'developer'){
             let {title,description,priority,status} = req.body
+            title = validation.checkString(title,'title')
+            description = validation.checkString(description,'description')
+            // priority = validation.checkBug(priority,'priority')
+            // status = validation.checkBug(status,'status')
+
             var update_obj = {title,description,priority,status} 
             
         }
         let bugid = req.params.bugId
         const updated_bug = bugData.updateBug(bugid,update_obj)
-        return res.json(updated_bug)
+        res.redirect('../' + req.params.bugId)
 
+        if(req.session.user.role){
+            const role = req.session.user.role;
+            if(role === 'user'){
+                let {title,description} = req.body
+                var update_obj = {title,description} 
+                
+            }
+            if(role === 'manager'){
+                let {title,description,priority,status,assignedDeveloper,assignedTester,estimatedTime} = req.body
+                var update_obj = {title,description,priority,status,assignedDeveloper,assignedTester,estimatedTime} 
+                
+            }
+            if(role === 'tester' || role === 'developer'){
+                let {title,description,priority,status,estimatedTime} = req.body
+                var update_obj = {title,description,priority,status,estimatedTime} 
+                
+            }
+            let bugid = req.params.bugId
+            await bugData.updateBug(bugid,update_obj,req.session.user.role)
+            res.redirect('../' + req.params.bugId)
+    
+        }
+        else{return res.status(400).json({error:'No role found for the user'})}
     }
     else{return res.status(400).json({error:'No role found for the user'})}
+}
+catch(e)
+{
+    return res.status(500).render('bugdetails',{error :true,msg:e})
+}
 
 
 
@@ -171,15 +264,25 @@ router
         validation.checkString(bugId,'BugId')
         validation.checkId(bugId, 'BugId')
         const get_bug1 = await bugData.getBug(bugId)
-        const get_users = await userData.getUsers(get_bug1.members)
-        if(get_bug1.assignedTo){
-            const get_assigned_user = await userData.getUsers([get_bug1.assignedTo])
-            get_bug1.assignedTo = get_assigned_user[0]
-        }
-        const get_creator = await userData.getUsers([get_bug1.creator])
-        get_bug1.members = get_users
 
-        get_bug1.creator = get_creator[0]
+        const {members} = await getProject(req.params.projectId);
+        const developers = [], testers = []
+
+        for await (let member of members){
+            const mem = await getUsers(member);
+            if(mem.role === 'manager') get_bug1.assignedManager = mem;
+            else if(mem.role === 'tester') testers.push(mem);
+            else if(mem.role === 'developer') developers.push(mem);
+        }
+
+        if(get_bug1.creator) (get_bug1.creator) =  await  getUsers(get_bug1.creator)
+
+        for await (let comment of get_bug1.comments){
+            comment.userId = await getUsers(comment.userId)
+        }
+
+        get_bug1.testers = testers;
+        get_bug1.developers = developers;
         get_bug1.roles = ['manager','tester','developer']
         return res.render('bugdetails',get_bug1)
     }
@@ -189,18 +292,14 @@ router
     }
 })
 
-.patch(async(req, res) => {
+.post(async(req, res) => {
     let bugId = req.params.bugId.trim()
     let updateObject = req.body
     let {title, description,creator,status,priority,assignedTo,members,projectId,estimatedTime,createdAt} = req.body
     try{
-//         if(!title || !description || !creator || !status || !priority || !assignedTo || !members || !projectId || !estimatedTime || !createdAt)
-//    {
-//        throw "All fields must be supplied"
-//    }   
    validation.checkBug(updateObject, 'Updated Bug')
    const update_bug = await bugData.updateBug(bugId, updateObject)
-   return res.json(update_bug)
+   return res.redirect('./')
     }
     catch(e)
     {
@@ -226,28 +325,56 @@ router
 router
 .route('/bugs/:bugId/addcomment')
 .post(upload.single('fileupload'),async (req,res) => {
+    try{
     if (req.file) {
+        console.log(req.file.originalname)
         req.body.file = req.file.originalname
         const fileBuffer = req.file.buffer;
         const filePath = `public/uploads/${req.session.user.email}/${req.params.bugId}/${req.file.originalname}`;
         req.body.files = filePath
+        const allowedExtensions = ['.jpg', '.jpeg', '.png']
+    const extname = path.extname(req.file.originalname).toLowerCase();
+    console.log(extname)
+    if(!allowedExtensions.includes(extname)){
+        console.log("Innnn")
+        throw 'Unacceptable extension, Accepts only Png, Jpeg, txt and Pdf'
+    }
 
         fs.mkdirSync(`public/uploads/${req.session.user.email}/${req.params.bugId}/`, {recursive:true});
         fs.writeFileSync(filePath, fileBuffer);
       }
 
     req.body.userId = req.session.user._id
-    await createComment(req.params.bugId,req.body)
+    await createComment(req.params.bugId,req.body,req.session.user.role)
+
+    
+
+    res.redirect('../' + req.params.bugId)
+}
+catch(e){
+    if(e.status==400){
+        return res.render('error',{error:true,msg:e.msg})
+    }
+    res.redirect(500,'../'+ req.params.bugId)
+}
   
 })
 
 router.route('/addmember')
 .get(async(req,res) => {
-    return res.render('addmember');
+    try{
+        const users = await getAllUsers();
+        return res.render('addmember', {members:users});
+    }
+    catch(e){
+        return res.render('addmember',{error:true,msg:e})
+    }
+   
 })
 .post(async (req,res) =>{
     try{
         const email = req.body.email;
+        await addMember(req.params.projectId, email)
         return res.redirect('/dashboard')
     } catch(e){
         res.status(404).render('addmember',{error:true,msg:e})
@@ -269,12 +396,7 @@ router
            
         catch(e)
         {
-            return res.status(404).json({error :e})
+            return res.status(404).json({error :true,msg:e})
         }
 })
-
-
-
-    
-
 export default router;

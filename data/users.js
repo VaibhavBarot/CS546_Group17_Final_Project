@@ -3,7 +3,7 @@ import validation from '../validation.js';
 import {users} from '../config/mongoCollections.js'
 import {ObjectId} from 'mongodb';
 import exportedHelpers from '../helpers.js';
-import e from 'express';
+
 
 
 export const registerUser = async(
@@ -21,50 +21,59 @@ export const registerUser = async(
     }
     let reg_user = {fname:firstName, lname:lastName, email:email, password:password, role:role, firstLogin:firstLogin}
 //   if(!firstName || !lastName || !username || !email || !password) throw "All fields must be supplied"
-const fields = [
-    { value: firstName, name: 'First name' },
-    { value: lastName, name: 'Last name' },
-    { value: email, name: 'Email' },
-    { value: password, name: 'Password' }
-];
+    const fields = [
+        { value: firstName, name: 'First name' },
+        { value: lastName, name: 'Last name' },
+        { value: email, name: 'Email' },
+        { value: password, name: 'Password' }
+    ];
 
-for (const field of fields) {
-    if (!field.value) {
-        throw (field.name + ' cannot be empty');
+    for (const field of fields) {
+        if (!field.value) {
+            throw (field.name + ' cannot be empty');
+        }
     }
-}
-validation.checkUser(reg_user)
+    email = email.toLowerCase()
+    validation.checkEmail(email);
+    // reg_user=validation.checkUser(reg_user)
 
- const user = await usersCollection.findOne({email});
+    const user = await usersCollection.findOne({email});
 
- if(user)
- {
-  throw "Email already exists";
- }
+    if(user)
+    {
+    throw "Email already exists";
+    }
 
- validation.checkPassword(password,'Password')
+    validation.checkPassword(password,'Password')
 
-validation.checkEmail(email);
+    
+    
+    
 
  const hashed_password = await bcrypt.hash(password, 10)
+ let pass = password
  password = hashed_password
 
- const create_user = await usersCollection.insertOne({
-    firstName,
-    lastName,
-    email,
-    password,
-    role,
-    firstLogin
+    const create_user = await usersCollection.insertOne({
+        firstName,
+        lastName,
+        email,
+        password,
+        role,
+        firstLogin
 
  },)
  if(!create_user) throw "User not registered"
  if(role === 'tester' || role === 'developer'){
-    exportedHelpers.sendEmail(email,'You are added to BugTracker.',"Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you.")
+    exportedHelpers.sendEmail(email,"You are added to BugTracker.",`Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you. you can use this email for login and your password is ${pass}`)
 
  }
- 
- return {id:create_user.insertedId,firstName:firstName,lastName:lastName,email:email,role:role, firstLogin:firstLogin};
+ if(role === 'manager'){
+    exportedHelpers.sendEmail(email,"You are assigned to a new project",`Congratulations! admin has assigned a new project to you. You can use this email for login and your password is ${pass}`)
+
+    }
+    
+    return {id:create_user.insertedId,firstName:firstName,lastName:lastName,email:email,role:role, firstLogin:firstLogin};
 
 }
 
@@ -73,8 +82,9 @@ export const loginUser = async(email, password)=>{
         throw 'Both email and password are required.'
     }
     
-    email = email.toLowerCase()
+    
     email = validation.checkString(email,'Email')
+    email = email.toLowerCase()
     validation.checkEmail(email)
 
 password = validation.checkString(password,'password')
@@ -96,21 +106,16 @@ else{
 }
 }
 
-export const getUsers = async(members_id) =>{
+export const getUsers = async (members_id) => {
     const usersCollection = await users()
-
-    const user_details_array = []
-    for(let i = 0; i < members_id.length ; i++){
-        const mem_id = members_id[i]
-        const user_details = await usersCollection.findOne({_id:new ObjectId(mem_id)})
-        user_details_array.push({firstName:user_details.firstName,
-                                lastName:user_details.lastName,
-                            email:user_details.email,
-                        role:user_details.role}
-                            )
-   
+    const user_details = await usersCollection.findOne({ _id: new ObjectId(members_id) })
+    return {
+        firstName: user_details.firstName,
+        lastName: user_details.lastName,
+        email: user_details.email,
+        role: user_details.role,
+        _id: user_details._id
     }
-    return user_details_array
 
 }
 
@@ -127,8 +132,9 @@ export const updatePassword = async(email, oldPassword, newPassword) =>{
     if(!email || !oldPassword || !newPassword){
         throw "All fields mus be supplied"
     }
-    email = email.toLowerCase()
+    
     email = validation.checkString(email,'Email')
+    email = email.toLowerCase()
     oldPassword = validation.checkString(oldPassword,'Old Password')
     validation.checkPassword(oldPassword,'Old Password')
     newPassword = validation.checkString(newPassword,'New Password')
@@ -146,6 +152,9 @@ export const updatePassword = async(email, oldPassword, newPassword) =>{
     if(!old_password_match){
         throw "Old Password is incorrect"
    }
+
+   if(oldPassword === newPassword) throw "Both passwords are same"
+    
     const result = await usersCollection.updateOne({email: email.toLowerCase()},{$set:{password: hashed_new_password,firstLogin:false}});
     if(result.modifiedCount === 0){
         throw "Password not updated"
@@ -157,7 +166,7 @@ export const getAllUsers = async() =>{
     const usersCollection = await users()
 
     let allUsers = await usersCollection.find({}).toArray()
-    return allUsers.filter(user => user.role !== 'manager')
+    return allUsers.filter(user => user.role === 'developer' || user.role === 'tester')
 }
 
 export default{registerUser,loginUser,getUsers, updatePassword, getUser, getAllUsers}

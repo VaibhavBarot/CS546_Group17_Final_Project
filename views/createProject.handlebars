@@ -1,0 +1,19 @@
+<div class="container">
+    {{#eq user.role 'manager'}}
+        <p class="h1 text-center my-2 text-bg-dark form-border">Add Project</p>
+        <form id="project-form" class="row form-border p-2 g-3 mt-2" method="post" action="/dashboard/createProject">
+            <div class="col-md-6">
+                <label for="pname" class="form-label">Project Name</label>
+                <input type="text" class="form-control" id="pname" name="pname">
+            </div>
+            <div class="col-md-6">
+                <label for="desc" class="form-label">Description</label>
+                <input type="text" class="form-control" id="desc" name="desc">
+            </div>
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-dark">Create Project</button>
+            </div>
+        </form>
+        <p><a href="/dashboard">Already have a project? Click Here to view all!</a></p>
+    {{/eq}}
+</div>
