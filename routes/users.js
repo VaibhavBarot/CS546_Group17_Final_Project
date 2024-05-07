@@ -87,8 +87,6 @@ router
     catch(e){return res.status(500).json({error: e.toString()});}
 })
 
-=======
->>>>>>> Stashed changes
 router.route('/manager')
 .get(async(req,res) => {
     return res.render('manager');
