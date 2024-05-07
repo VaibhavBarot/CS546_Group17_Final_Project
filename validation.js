@@ -138,7 +138,7 @@ const exportedMethods = {
     if(files) this.checkString(files,'Files')
   },
   checkStatus(inputStatus){
-    let valid_status = ['inprogress','todo','completed','testing','inreview','notassigned']
+    let valid_status = ['inprogress','todo','completed','intesting','inreview','notassigned']
   
   if (valid_status.includes(inputStatus)){return true}
   else{throw 'Invalid Status'}

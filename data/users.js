@@ -3,7 +3,7 @@ import validation from '../validation.js';
 import {users} from '../config/mongoCollections.js'
 import {ObjectId} from 'mongodb';
 import exportedHelpers from '../helpers.js';
-import e from 'express';
+
 
 
 export const registerUser = async(
@@ -33,7 +33,9 @@ export const registerUser = async(
             throw (field.name + ' cannot be empty');
         }
     }
-    validation.checkUser(reg_user)
+    email = email.toLowerCase()
+    validation.checkEmail(email);
+    // reg_user=validation.checkUser(reg_user)
 
     const user = await usersCollection.findOne({email});
 
@@ -44,7 +46,9 @@ export const registerUser = async(
 
     validation.checkPassword(password,'Password')
 
-    validation.checkEmail(email);
+    
+    
+    
 
  const hashed_password = await bcrypt.hash(password, 10)
  let pass = password
@@ -78,8 +82,9 @@ export const loginUser = async(email, password)=>{
         throw 'Both email and password are required.'
     }
     
-    email = email.toLowerCase()
+    
     email = validation.checkString(email,'Email')
+    email = email.toLowerCase()
     validation.checkEmail(email)
 
 password = validation.checkString(password,'password')
@@ -127,8 +132,9 @@ export const updatePassword = async(email, oldPassword, newPassword) =>{
     if(!email || !oldPassword || !newPassword){
         throw "All fields mus be supplied"
     }
-    email = email.toLowerCase()
+    
     email = validation.checkString(email,'Email')
+    email = email.toLowerCase()
     oldPassword = validation.checkString(oldPassword,'Old Password')
     validation.checkPassword(oldPassword,'Old Password')
     newPassword = validation.checkString(newPassword,'New Password')

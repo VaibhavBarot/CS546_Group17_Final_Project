@@ -197,10 +197,10 @@ router
             let {title,description,priority,status,assignedDeveloper,assignedTester} = req.body
             title = validation.checkString(title,'title')
             description = validation.checkString(description,'description')
-            priority = validation.checkBug(priority,'priority')
-            status = validation.checkBug(status,'status')
-            assignedDeveloper = validation.checkBug(assignedDeveloper,'Developer')
-            assignedTester = validation.checkBug(assignedTester,'Tester')
+            // priority = validation.checkBug(priority,'priority')
+            // status = validation.checkBug(status,'status')
+            // assignedDeveloper = validation.checkBug(assignedDeveloper,'Developer')
+            // assignedTester = validation.checkBug(assignedTester,'Tester')
             // estimatedTime =
 
             var update_obj = {title,description,priority,status,assignedDeveloper,assignedTester} 
@@ -210,8 +210,8 @@ router
             let {title,description,priority,status} = req.body
             title = validation.checkString(title,'title')
             description = validation.checkString(description,'description')
-            priority = validation.checkBug(priority,'priority')
-            status = validation.checkBug(status,'status')
+            // priority = validation.checkBug(priority,'priority')
+            // status = validation.checkBug(status,'status')
 
             var update_obj = {title,description,priority,status} 
             
@@ -352,6 +352,9 @@ router
     res.redirect('../' + req.params.bugId)
 }
 catch(e){
+    if(e.status==400){
+        return res.render('error',{error:true,msg:e.msg})
+    }
     res.redirect(500,'../'+ req.params.bugId)
 }
   
@@ -364,7 +367,7 @@ router.route('/addmember')
         return res.render('addmember', {members:users});
     }
     catch(e){
-        return res.status(404).json(e)
+        return res.render('addmember',{error:true,msg:e})
     }
    
 })
@@ -393,7 +396,7 @@ router
            
         catch(e)
         {
-            return res.status(404).json({error :e})
+            return res.status(404).json({error :true,msg:e})
         }
 })
 export default router;

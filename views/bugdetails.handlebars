@@ -21,17 +21,19 @@
             <div class="col-md-12">
             <label for="status" class="form-label">Status</label>
             <select id="status" class="form-select form-control" name="status" disabled>
-                <option value="todo" selected>To Do</option>
-                <option value="inprogress">In Review</option>
+                <option value={{status}} selected>{{status}}</option>
+                <option value="inreview">In Review</option>
                 <option value="inprogress">In Progress</option>
-                <option value="inprogress">In Testing</option>
-                <option value="inprogress">Completed</option>
+                <option value="intesting">In Testing</option>
+                <option value="completed">Completed</option>
+                <option value="todo">todo</option>
             </select>
         </div>
             <div class="col-md-12">
             <label for="priority" class="form-label">Priority</label>
             <select id="priority" class="form-select form-control" name="priority" disabled>
-                <option value="high" selected>High</option>
+                <option value="medium">High</option>
+                <option value={{priority}} selected>{{priority}}</option>
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
             </select>

@@ -126,12 +126,6 @@ const dummyProjectData = (users) => { return [
       "members":[users[9],users[11],users[8]]
   },
   {
-    "name":"SmartTRader",
-    "description":"A trading application",
-    "creator":users[0],
-    "members":[users[0],users[10],users[9]]
-},
-  {
     "name":"EduTech",
     "description":"An online education platform",
     "creator": users[11],
@@ -384,27 +378,6 @@ const dummyBugData = (users,projects) => { return [
             "userId": users[4],
             "content": "Adjust CSS for responsive design.",
             "createdAt": "2024-05-02T10:00:00Z"
-          }
-        ]
-      },
-      {
-        "title": "Data sync error across devices",
-        "description": "Users are experiencing issues with data not syncing properly across different devices.",
-        "creator": users[5],
-        "status": "inprogress",
-        "priority": "high",
-        "assignedManager": users[0],
-        "assignedTester": users[10],
-        "assignedDeveloper": users[9],
-        
-        "projectId": projects[4],
-        "estimatedTime": 10,
-        "createdAt": "2024-05-06T10:45:00Z",
-        "comments": [
-          {
-            "userId": users[1],
-            "content": "Check the synchronization logic and server response times.",
-            "createdAt": "2024-05-06T10:50:00Z"
           }
         ]
       }

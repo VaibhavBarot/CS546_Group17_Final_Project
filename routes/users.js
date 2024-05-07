@@ -5,6 +5,7 @@ import validation from '../validation.js';
 import moment from 'moment';
 import { getAllUserProjects,getAllProjects } from '../data/projects.js';
 import xss from 'xss'
+import { projectData } from '../data/index.js';
 
 const router = Router()
 router.route('/').get(async(req,res) => {

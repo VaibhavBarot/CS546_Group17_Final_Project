@@ -10,7 +10,7 @@ import { getProject } from "./projects.js";
 import { projectData } from "./index.js";
 
 const createBug = async (bug_obj) => {
-    console.log("dsfc ",bug_obj)
+    // console.log("dsfc ",bug_obj)
    
     if (!bug_obj.title || !bug_obj.description || !bug_obj.priority || !bug_obj.status) throw "Missing Required Fields"
 
@@ -154,7 +154,7 @@ const updateBug = async (
     updateObject,
     role
 ) => {
-    console.log("update obj ",updateObject)
+    // console.log("update obj ",updateObject)
     validation.checkId(bugId, 'Bug Id')
     validation.checkBug(updateObject,role)
     const bugsCollection = await bugs()
@@ -204,7 +204,7 @@ const filterBugs = async (filterParams, userId, role, projectId) => {
     validation.checkId(userId, 'User Id')
     validation.checkString(role, 'Role')
     let results = await getAllUserBugs(userId, role, projectId)
-    console.log(filterParams,results)
+    // console.log(filterParams,results)
 
     if (results) {
         if (filterParams.search.trim().length > 0) {
@@ -245,15 +245,15 @@ const filterBugs = async (filterParams, userId, role, projectId) => {
 
         }
         if (filterParams.toSort === 'L2H') {
-            console.log("Innn")
-            console.log("Results before ",results)
+            // console.log("Innn")
+            // console.log("Results before ",results)
             sortBugs('L2H', results)
-            console.log("Results before ",results)
+            // console.log("Results before ",results)
         }
         if (filterParams.toSort === 'H2L') {
             sortBugs('H2L', results)
         }
-        console.log("Sorted results ",results)
+        // console.log("Sorted results ",results)
 
     }
     return results
@@ -280,7 +280,7 @@ const bugsSummary = async (projectId) => {
             'inprogress': 0,
             'completed': 0,
             'inreview': 0,
-            'testing': 0
+            'intesting': 0
         },
         priority: {
             'high': 0,

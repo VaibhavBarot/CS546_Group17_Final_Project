@@ -461,6 +461,7 @@ document.addEventListener('DOMContentLoaded',function(){
                 if(comment !== ''){
 
                 }
+               
             })
         }
 
