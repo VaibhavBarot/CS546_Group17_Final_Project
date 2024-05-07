@@ -13,7 +13,7 @@ export const root_middleware = (req,res,next) =>{
         {
             res.locals.isLoggedIn = true;
             res.locals.user = req.session.user;
-            if(req.url !== '/admin' && req.url !== '/logout'){
+            if(req.url !== '/admin' && req.url !== '/logout' && req.url!=='/register'){
                 return res.redirect('/admin')
             }
             next()

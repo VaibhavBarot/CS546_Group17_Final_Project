@@ -21,51 +21,64 @@ export const registerUser = async(
     }
     let reg_user = {fname:firstName, lname:lastName, email:email, password:password, role:role, firstLogin:firstLogin}
 //   if(!firstName || !lastName || !username || !email || !password) throw "All fields must be supplied"
-const fields = [
-    { value: firstName, name: 'First name' },
-    { value: lastName, name: 'Last name' },
-    { value: email, name: 'Email' },
-    { value: password, name: 'Password' }
-];
+    const fields = [
+        { value: firstName, name: 'First name' },
+        { value: lastName, name: 'Last name' },
+        { value: email, name: 'Email' },
+        { value: password, name: 'Password' }
+    ];
 
-for (const field of fields) {
-    if (!field.value) {
-        throw (field.name + ' cannot be empty');
+    for (const field of fields) {
+        if (!field.value) {
+            throw (field.name + ' cannot be empty');
+        }
     }
-}
-validation.checkUser(reg_user)
+    validation.checkUser(reg_user)
 
- const user = await usersCollection.findOne({email});
+    const user = await usersCollection.findOne({email});
 
- if(user)
- {
-  throw "Email already exists";
- }
+    if(user)
+    {
+    throw "Email already exists";
+    }
 
- validation.checkPassword(password,'Password')
+    validation.checkPassword(password,'Password')
 
-validation.checkEmail(email);
+    validation.checkEmail(email);
 
+<<<<<<< Updated upstream
  const hashed_password = await bcrypt.hash(password, 10)
  let pass = password
  password = hashed_password
+=======
+    const hashed_password = await bcrypt.hash(password, 10)
+    password = hashed_password
+>>>>>>> Stashed changes
 
- const create_user = await usersCollection.insertOne({
-    firstName,
-    lastName,
-    email,
-    password,
-    role,
-    firstLogin
+    const create_user = await usersCollection.insertOne({
+        firstName,
+        lastName,
+        email,
+        password,
+        role,
+        firstLogin
 
+<<<<<<< Updated upstream
  },)
  if(!create_user) throw "User not registered"
  if(role === 'tester' || role === 'developer'){
     exportedHelpers.sendEmail(email,`You are added to BugTracker.',"Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you. you can use this email for login and your password is ${pass}`)
+=======
+    },)
+    //  console.log(create_user.firstName)
+    if(!create_user) throw "User not registered"
+    if(role === 'tester' || role === 'developer'){
+        exportedHelpers.sendEmail(email,'You are added to BugTracker.',`Congratulations! you are added to BugTracker Portal, Hang Tight, your manager will soon assign a project to you.you can use this email for login and your password is ${password})`)
+>>>>>>> Stashed changes
 
- }
- 
- return {id:create_user.insertedId,firstName:firstName,lastName:lastName,email:email,role:role, firstLogin:firstLogin};
+    }
+    
+    return {id:create_user.insertedId,firstName:firstName,lastName:lastName,email:email,role:role, firstLogin:firstLogin};
 
 }
 

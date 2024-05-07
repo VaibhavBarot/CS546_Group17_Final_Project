@@ -5,7 +5,6 @@ import validation from '../validation.js';
 import moment from 'moment';
 import { getAllUserProjects,getAllProjects } from '../data/projects.js';
 import xss from 'xss'
-import { projectData } from '../data/index.js';
 
 const router = Router()
 router.route('/').get(async(req,res) => {
@@ -49,10 +48,8 @@ router.route('/register')
             return res.status(400).render('register',{error:'Password does not match'})
         }
     
-        let result =    await registerUser(fname,lname,email,password,role);
-
+        let result =  await registerUser(fname,lname,email,password,role);
         if(!result) return res.status(500).send({error:'Internal Server Error'});
-
         return res.redirect('/login');
     } catch(e){
         res.status(400).render('register',{error:true,msg:e})
@@ -63,6 +60,7 @@ router.route('/admin')
 .get(async(req,res) => {
     return res.render('admin');
 })
+<<<<<<< Updated upstream
 
 router
 .route('/dashboard/createProject')
@@ -89,6 +87,8 @@ router
     catch(e){return res.status(500).json({error: e.toString()});}
 })
 
+=======
+>>>>>>> Stashed changes
 router.route('/manager')
 .get(async(req,res) => {
     return res.render('manager');
